@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Voting</title>
+    <link rel="stylesheet" href="vote.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="vote.js"></script>
+</head>
+<body>
+    <div class="container">
+      <div>
+        <h1>Buat Voting Baru</h1>
+        <input type="text" id="votingTitle" placeholder="Judul Voting">
+        <input type="text" id="option1" placeholder="Pilihan 1">
+        <input type="text" id="option2" placeholder="Pilihan 2">
+        <input type="number" id="duration" placeholder="Durasi (menit)">
+        <button onclick="createVoting()">Buat Voting</button>
+        </div>
+        
+        <div id="voteOptions"style="display:none;"></div>
+    </div>
+</body>
+</html>
