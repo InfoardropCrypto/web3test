@@ -12,12 +12,7 @@
         <div>
             <label for="networkSelect">Select Network:</label>
             <select id="networkSelect">
-                <option value="btc">Bitcoin</option>
                 <option value="eth">Ethereum</option>
-                <option value="polygon">Polygon</option>
-                <option value="bsc">Binance Smart Chain</option>
-                <option value="sol">Solana</option>
-                <option value="ton">Ton</option>
             </select>
         </div>
         
@@ -31,8 +26,13 @@
         </div>
         
         <button id="startMiningButton">Start Mining</button>
+
+<!-- Tombol Auto Mining -->
+<button id="autoMineButton">⚙️ Auto Mining: OFF</button>
+
+        
         <p>Status: <span id="miningStatus">Not started</span></p>
-        <p>Current Balance: <span id="miningBalance">0</span> <span id="miningTicker">BTC</span></p>
+        <p>Current Balance: <span id="miningBalance">0</span> <span id="miningTicker">ETH</span></p>
         <p>Time Remaining: <span id="miningTime">0</span> seconds</p>
 
         <!-- Include Firebase scripts -->
