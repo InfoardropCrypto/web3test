@@ -97,7 +97,8 @@ const tickerMap = {
     usdc_erc20: 'USDC',
     weth: 'WETH',
     lido: 'LIDO',
-    steth: 'sETH'
+    steth: 'sETH',
+    optimism_eth: 'ETH'
 };
 
 // Define gas fee range
@@ -109,6 +110,7 @@ const gasFeeRanges = {
     steth: [0.01, 0.01],
     usdc_erc20: [0.01, 0.01],
     usdt_erc20: [0.01, 0.01],
+    optimism_eth: [0.00005, 0.00002],
 };
 
 // Fungsi untuk mendapatkan gas fee acak dalam rentang yang ditentukan
