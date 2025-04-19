@@ -68,28 +68,45 @@ function displayTransactions(transactions) {
             return new Date(transactions[b].timestamp) - new Date(transactions[a].timestamp);
         });
 
+        
+        
         sortedTransactionIds.forEach(transactionId => {
-            const transaction = transactions[transactionId];
-            const explorerUrl = generateExplorerUrl(transaction.network, transaction.transactionHash);
-            const transactionElement = document.createElement('div');
-            transactionElement.className = 'transaction';
-            transactionElement.innerHTML = `
-                <p><strong>Tx hash:</strong> <span class="long-text">${transactionId}</span></p>
-                <p><strong>Type:</strong> ${transaction.type === 'swap' ? 'swap' : 'send crypto'}</p>
-                <p><strong>Source:</strong> ${transaction.network}</p>
-                <p><strong>Sender:</strong> ${transaction.sender} </p>
-                <p><strong>Recipient:</strong> ${transaction.recipient}</p>
-                <p><strong>Value:</strong> ${transaction.amount}</p>
-                <p><strong>Memo:</strong> ${transaction.memo}</p>
-                <p><strong>Gas fee:</strong> ${transaction.gasFee}</p>
-                <p><strong>Success : </strong><a style="color:green;font-family:monospace;">true</a></p>
-                <p><strong>Time:</strong> ${new Date(transaction.timestamp).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })} ${new Date(transaction.timestamp).toLocaleDateString('en-GB')}</p>
-                <hr>
-            `;
-            transactionsContainer.appendChild(transactionElement);
+    const transaction = transactions[transactionId];
+    const explorerUrl = generateExplorerUrl(transaction.network, transaction.transactionHash);
 
-            // Update totals
-            totalTransactions++;
+    const sender = transaction.sender || 'anonym';
+    const recipient = transaction.recipient || 'anonym';
+    const memo = transaction.memo || 'encrypted';
+
+    const transactionElement = document.createElement('div');
+    transactionElement.className = 'transaction';
+    transactionElement.innerHTML = `
+        <p><strong>Tx hash:</strong> <span class="long-text">${transactionId}</span></p>
+        <p><strong>Type:</strong> ${
+            transaction.type === 'swap'
+                ? 'swap'
+                : transaction.type === 'bridge'
+                ? 'bridge'
+                : transaction.type === 'stake'
+                ? 'stake'
+                : transaction.type === 'unstake'
+                ? 'unstake'
+                : transaction.type === 'mining'
+                ? 'mining'
+                : 'send crypto'
+        }</p>
+        <p><strong>Source:</strong> ${transaction.network}</p>
+        <p><strong>Sender:</strong> ${sender}</p>
+        <p><strong>Recipient:</strong> ${recipient}</p>
+        <p><strong>Value:</strong> ${transaction.amount}</p>
+        <p><strong>Memo:</strong> ${memo}</p>
+        <p><strong>Gas fee:</strong> ${transaction.gasFee}</p>
+        <p><strong>Success : </strong><a style="color:green;font-family:monospace;">true</a></p>
+        <p><strong>Time:</strong> ${new Date(transaction.timestamp).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })} ${new Date(transaction.timestamp).toLocaleDateString('en-GB')}</p>
+        <hr>
+    `;
+    transactionsContainer.appendChild(transactionElement);
+    totalTransactions++;
             const transactionDate = new Date(transaction.timestamp).toDateString();
             const today = new Date().toDateString();
             if (transactionDate === today) {
@@ -103,7 +120,7 @@ function displayTransactions(transactions) {
                 networkTotals[network] = 0;
             }
             networkTotals[network]++;
-        });
+});
 
         // Update totals display
         if (totalTransactionsElement) {
@@ -142,7 +159,7 @@ function displayTransactions(transactions) {
         }
     } else {
         if (transactionsContainer) {
-            transactionsContainer.innerHTML = '<p>No transactions found.</p>';
+            transactionsContainer.innerHTML = '<p>No transactions found. -_-</p>';
         }
         if (totalTransactionsElement) {
             totalTransactionsElement.innerHTML = `
