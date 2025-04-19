@@ -16,8 +16,9 @@
         <nav class="logo-container">
             <h1>IAC | STAKE</h1>
             <select id="networkSelect">
-        <option value="ac_testnet" data-image="cryptologo/ethereum.png">Ac Network</option>
+        <option value="ac" data-image="cryptologo/iac_img.png">Ac Network</option>
         <option value="eth" data-image="cryptologo/ethereum.png">Ethereum</option>
+        <option value="optimism" data-image="cryptologo/optimism.png">Optimism</option>
     </select>
             <button id="connectWalletButton" class="button" onclick="confirm('Connected')">Connected</button>
             <button id="themeToggle" class="icon-button">
@@ -40,18 +41,30 @@
             
             <div>
             </div>
+            
+            <label for="validatorSelect">Pilih Validator:</label>
+<select id="validatorSelect">
+  
+  <option value=""></option>
+  <option value="ethereum.org" data-apy="5">ethereum.org </option>
+  <option value="optimism.org" data-apy="8">optimism.org</option>
+  <option value="lido.fi" data-apy="2.9">lido.fi</option>
+</select>
 
+<div id="currentApyDisplay">APY: -</div>
+
+<p><strong>Estimasi Reward : </strong><a id="estimatedReward">0</a></p>
+
+
+            
             <button id="stakeButton" class="stake-button">Stake</button>
-            <p>APY 20%</p>
-            <div id="rewardEstimateContainer">
-                <p>Estimated Reward: <span id="estimatedReward">0.0000</span> </p>
-            </div>
+            
+            
             <p id="stakingResult" class="staking-result"></p>
         </div>
 
         <div id="currentStakes">
             <h3>Current Stakes:</h3>
-            <!-- Stakes will be dynamically inserted here -->
         </div>
 
         <div>
