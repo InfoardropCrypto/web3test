@@ -34,15 +34,13 @@ const tickerMap = {
     eth: 'ETH',
     lido: 'LDO',
     steth: 'stETH',
-    weth: 'ETH', // Display WETH as ETH
+    weth: 'ETH',
     usdc_erc20: 'USDC',
     usdt_erc20: 'USDT',
-    optimism_eth: 'ETH', // Display ETH on Optimism as ETH
+    optimism_eth: 'ETH',
     optimism: 'OP',
 };
 
-// Map your internal token names to CoinGecko API token IDs
-// For custom tokens 'ac' and 'wac', we'll use a special ID to handle them with mock prices.
 const apiTokenMap = {
     eth: 'ethereum',
     lido: 'lido-dao',
@@ -50,23 +48,15 @@ const apiTokenMap = {
     weth: 'ethereum',
     usdc_erc20: 'usd-coin',
     usdt_erc20: 'tether',
-    optimism_eth: 'ethereum', // ETH on Optimism has the same price as ETH
+    optimism_eth: 'ethereum',
     optimism: 'optimism',
 };
 
-// NEW: Function to fetch real price from CoinGecko API
 async function fetchRealPrice(apiTokenId) {
-    if (apiTokenId === '' || apiTokenId === '') { // Kondisi ini selalu benar jika apiTokenId adalah string kosong
-        return Promise.resolve(2.50); // Tetap mock untuk token custom
+    if (apiTokenId === '' || apiTokenId === '') { 
+        return Promise.resolve(2.50);
     }
-    // if (!apiTokenId || apiTokenId.startsWith('custom_')) { // ... }
 
-    // const MOCK_PRICES = { ... }; // Anda bisa hapus ini atau biarkan untuk fallback
-    // if (MOCK_PRICES[apiTokenId] && false) { // Ubah 'false' jika ingin tetap pakai MOCK_PRICES untuk beberapa token
-    //     return Promise.resolve(MOCK_PRICES[apiTokenId]);
-    // }
-
-    // Aktifkan panggilan API live
     try {
         const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${apiTokenId}&vs_currencies=usd`);
         if (!response.ok) {
@@ -78,41 +68,21 @@ async function fetchRealPrice(apiTokenId) {
             return data[apiTokenId].usd;
         } else {
             console.warn(`Price not found for ${apiTokenId} in CoinGecko API response.`);
-            return 0; // Fallback jika data tidak ditemukan
+            return 0;
         }
     } catch (error) {
         console.error(`Error fetching price for ${apiTokenId} from CoinGecko:`, error);
-        return 0; // Fallback jika ada error lain
+        return 0;
     }
 }
-//This function seems to be for reading prices, not setting them from an external source.
-//It's not directly involved in fetching from CoinGecko, so leaving as is for now.
-//If it was intended to fetch all token prices, it would need significant changes.
-/*
-function fetchPrices() {
-    Object.keys(priceRanges).forEach(token => { // priceRanges is removed
-        const priceRef = firebase.database().ref(`price/${fromNetwork}_to_${toNetwork}`); // This path is too specific
-        priceRef.on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                console.log(`Price for ${toNetwork}: $${data.price}`);
-            } else {
-                console.log(`No price data for ${token}`);
-            }
-        });
-    });
-}
-*/
 
-async function updatePrice() { // Made async
+async function updatePrice() {
     const fromNetwork = fromNetworkSelect.value;
     const toNetwork = toNetworkSelect.value;
 
     if (fromNetwork && toNetwork) {
         if (fromNetwork === toNetwork) {
-            // This alert is fine, but the UI should prevent this selection if possible.
-            // Consider disabling the identical option in the 'toNetwork' select when 'fromNetwork' changes.
-            // alert('Cannot swap between the same network.'); // Already handled by event listeners
+           
             return;
         }
 
@@ -142,8 +112,8 @@ async function updatePrice() { // Made async
             
             const priceRef = firebase.database().ref(`price/${fromNetwork}_to_${toNetwork}`);
             priceRef.set({
-                fromPriceUSD: fromPriceUSD.toString(), // Storing USD price of the 'from' token
-                toPriceUSD: toPriceUSD.toString(),     // Storing USD price of the 'to' token
+                fromPriceUSD: fromPriceUSD.toString(),
+                toPriceUSD: toPriceUSD.toString(),
                 conversionRate: conversionRate,
                 timestamp: new Date().toISOString()
             });
@@ -160,7 +130,7 @@ async function updatePrice() { // Made async
                  }
             }
         } else {
-            priceElement.textContent = `Price: N/A (API error or toPrice is 0)`;
+            priceElement.textContent = `Price: N/A (RPC Down)`;
             if (document.getElementById('estimatedAmount')) {
                 document.getElementById('estimatedAmount').textContent = `Estimated: 0.00`;
             }
@@ -205,17 +175,17 @@ function updateBalances() {
     }
 }
 
-let countdownTimer = 10; // Renamed to avoid conflict if 'countdown' is used elsewhere
+let countdownTimer = 20;
 function startCountdown() {
     const countdownInterval = setInterval(() => {
         countdownElement.textContent = `Next price update in: ${countdownTimer}s`;
         countdownTimer--;
         if (countdownTimer < 0) {
             clearInterval(countdownInterval);
-            updatePrice(); // This is now async, but fine to call without await in setInterval
+            updatePrice();
             updateGasFee();
-            countdownTimer = 10; // Reset timer
-            startCountdown(); // Restart
+            countdownTimer = 20;
+            startCountdown();
         }
     }, 1000);
 }
@@ -225,22 +195,19 @@ fromNetworkSelect.addEventListener('change', () => {
     const currentToNetwork = toNetworkSelect.value;
 
     if (fromNetwork === currentToNetwork) {
-        // Find the first available option in toNetworkSelect that is not fromNetwork
+
         for (let option of toNetworkSelect.options) {
             if (option.value !== fromNetwork) {
                 toNetworkSelect.value = option.value;
                 break;
             }
         }
-         // If all other options were the same (e.g. only two options, now both same)
-        // this might not change. Consider more robust logic if needed,
-        // like temporarily disabling the conflicting option or having a default distinct pair.
     }
     checkRouterAvailability();
     updateBalances();
-    updatePrice(); // Call async updatePrice
-    updateEstimatedAmount(); // Call async updateEstimatedAmount
-    updateGasFee(); // Update gas fee for the new 'from' network
+    updatePrice();
+    updateEstimatedAmount();
+    updateGasFee();
 });
 
 toNetworkSelect.addEventListener('change', () => {
@@ -248,7 +215,7 @@ toNetworkSelect.addEventListener('change', () => {
     const currentFromNetwork = fromNetworkSelect.value;
 
     if (toNetwork === currentFromNetwork) {
-         for (let option of fromNetworkSelect.options) { // Check fromNetworkSelect
+         for (let option of fromNetworkSelect.options) {
             if (option.value !== toNetwork) {
                 fromNetworkSelect.value = option.value;
                 break;
@@ -257,14 +224,13 @@ toNetworkSelect.addEventListener('change', () => {
     }
     checkRouterAvailability();
     updateBalances();
-    updatePrice(); // Call async updatePrice
-    updateEstimatedAmount(); // Call async updateEstimatedAmount
-    // Gas fee depends on 'fromNetwork', so no need to call updateGasFee() here unless 'fromNetwork' changed.
+    updatePrice();
+    updateEstimatedAmount();
 });
 
 
 amountInput.addEventListener('input', () => {
-    updateEstimatedAmount(); // Call async updateEstimatedAmount
+    updateEstimatedAmount();
 });
 
 function connectWallet() {
@@ -272,7 +238,6 @@ function connectWallet() {
 
     if (user) {
         const userId = user.uid;
-        // networkSelect might be hidden, default to a primary network or first in list
         const selectedNetworkKey = networkSelect.value || Object.keys(apiTokenMap)[0];
 
 
@@ -290,9 +255,8 @@ function connectWallet() {
             document.getElementById('swapSection').style.display = 'block';
         }
         
-        // alert('Wallet Connected'); // User experience: alerts can be annoying. Consider a less intrusive notification.
         updateBalances();
-        updatePrice(); // Call async updatePrice
+        updatePrice();
     } else {
         walletStatus.textContent = 'Not Connected';
         walletStatus.style.color = 'red';
@@ -304,7 +268,7 @@ function connectWallet() {
     }
 }
 
-swapButton.addEventListener('click', async () => { // Made async
+swapButton.addEventListener('click', async () => {
     const fromNetwork = fromNetworkSelect.value;
     const toNetwork = toNetworkSelect.value;
     const amount = parseFloat(amountInput.value);
@@ -325,11 +289,10 @@ swapButton.addEventListener('click', async () => { // Made async
         return;
     }
     
-const noRouter = (fromNetwork === 'eth' && (toNetwork === 'wac' || toNetwork === 'optimism_eth')) ||
-                 (fromNetwork === 'wac' && (toNetwork === 'eth' || toNetwork === 'optimism_eth'));
+const noRouter = (fromNetwork === 'optimism_eth' && (toNetwork === 'steth' || toNetwork === 'eth')) ||
+                 (fromNetwork === 'eth' && (toNetwork === 'op' || toNetwork === 'optimism_eth'));
 
-    let fromPriceForTx, toPriceForTx, conversionRateForTx; // These will be USD prices if router exists
-
+    let fromPriceForTx, toPriceForTx, conversionRateForTx;
     if (noRouter) {
         const proceed = confirm(`Router not available for ${tickerMap[fromNetwork]} → ${tickerMap[toNetwork]}. Price will be marked as "No Router". Do you want to continue to the bridge page?`);
         if (proceed) {
@@ -662,7 +625,7 @@ if (networkSelect && fromNetworkSelect && typeof allNetworks !== 'undefined') {
     
 function generateTransactionHash() {
     const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'; // Corrected: 'x' and 'z'
-    let hash = '0x'; // Often hashes are prefixed with 0x
+    let hash = ''; // Often hashes are prefixed with 0x
     for (let i = 0; i < 64; i++) {
         hash += chars.charAt(Math.floor(Math.random() * chars.length));
     }
