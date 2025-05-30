@@ -1,0 +1,174 @@
+/* Reset default margin dan padding */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Warna utama */
+:root {
+    --primary-color: #000000;
+    --secondary-color: #ffffff;
+    --bg-color: #f4f4f4;
+    --text-color: #000000;
+    --card-bg: #ffffff;
+    --border-color: #ddd;
+    --button-hover: #e0e0e0;
+    --danger-color: #ff4d4d;
+}
+
+/* Background utama */
+body {
+    background: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Container utama */
+.container {
+    max-width: 800px;
+    width: 100%;
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color);
+}
+
+/* Heading */
+h1 {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Input Styling */
+input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    outline: none;
+    background: #f9f9f9;
+    color: #333;
+    font-size: 16px;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Hover & Focus Effect */
+input:hover {
+    border-color: #007bff;
+}
+
+input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+}
+
+/* Placeholder Styling */
+input::placeholder {
+    color: #888;
+    font-style: italic;
+}
+
+/* Animasi Placeholder saat Focus */
+input:focus::placeholder {
+    opacity: 0.6;
+    transition: opacity 0.3s ease-in-out;
+}
+
+
+/* Tombol */
+button {
+    background: var(--primary-color);
+    color: var(--secondary-color);
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background: black;
+    color: #fff;
+}
+
+/* Kotak Voting */
+.vote-card {
+    background: var(--card-bg);
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+    position: relative;
+}
+
+.vote-card h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Countdown */
+.vote-card .countdown {
+    font-size: 14px;
+    color: var(--primary-color);
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Tombol Vote */
+.vote-button {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--secondary-color);
+    background: var(--primary-color);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: opacity 0.3s;
+}
+
+.vote-button:hover {
+    background: var(--button-hover);
+    color: var(--primary-color);
+}
+
+/* Hasil Voting */
+.results {
+    margin-top: 10px;
+    padding: 10px;
+    background: #f9f9f9;
+    border-radius: 6px;
+}
+
+/* Tombol Hapus */
+.delete-button {
+    background: var(--danger-color);
+    margin-top: 10px;
+}
+
+.delete-button:hover {
+    background: #cc0000;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .container {
+        width: 90%;
+    }
+
+    button {
+        width: 100%;
+    }
+}

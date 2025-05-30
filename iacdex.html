@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iacdex.io</title>
+    <link rel="stylesheet" href="iacdex.css">
+    <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+</head>
+<body>
+    <nav class="logo-container">
+        <img src="cryptologo/iac1.png" alt="img logo">
+        
+        <button id="connectWalletButton" class="button">Connect Wallet</button>
+        <p id="walletStatus">Not Connected</p>
+        <p id="networkAddress" style="font-size:10px;display:none;">Network Address: N/A</p>
+    </nav>
+    
+    <div style="height:90px;"></div>
+    
+    <!-- Swap Section -->
+    
+    <div style="height:30px;"></div>
+
+    <div id="swapSection"> 
+
+    <div class="network-select" style="display:none;">
+        <label for="networkSelect">Select Network:</label>
+        <select id="networkSelect">
+            <option value="eth">Ethereum</option>
+        </select>
+    </div>
+
+    <br>
+
+    <div class="divjup">
+    <p id="fromBalance">You're Selling </p>
+    <label for="fromNetwork"></label>
+    <select id="fromNetwork">
+        <option value="eth" data-image="cryptologo/ethereum.png">
+          Ethereum
+        </option>
+        <option value="optimism_eth" data-image="cryptologo/optimism.png">Optimism Network</option>
+        <option value="optimism" data-image="cryptologo/optimism.png">Optimism</option>
+        <option value="lido" data-image="cryptologo/lido_dao.png">Lido Dao</option>
+        <option value="steth" data-image="cryptologo/steth.png">Lido Staked Ether</option>
+        <option value="usdc_erc20" data-image="cryptologo/usdc.png">USDC_ERC20</option>
+        <option value="usdt_erc20" data-image="cryptologo/tether.png">USDT_ERC20</option>
+        <option value="weth" data-image="cryptologo/wethereum.png">WETH</option>
+        
+    </select>
+
+    <input type="number" class="inputjup" id="amount" step="any" placeholder="0.00">
+    
+    <!-- Tombol Pilihan Persentase -->
+    <div class="percentage-buttons">
+        <button onclick="setPercentage(25)">25%</button>
+        <button onclick="setPercentage(50)">50%</button>
+        <button onclick="setPercentage(75)">75%</button>
+        <button onclick="setPercentage(98.99999999999999)">100%</button>
+    </div>
+</div>
+    
+    <button id="autoSwitchButton" class="button">↑↓</button>
+
+    <div class="divjup2">
+        <p id="toBalance">You're Buying </p>
+        <label for="toNetwork"></label>
+        <select id="toNetwork">
+               <option value="usdc_erc20" data-image="cryptologo/usdc.png">USDC_ERC20</option>
+                <option value="eth" data-image="cryptologo/ethereum.png">Ethereum</option>
+                <option value="optimism" data-image="cryptologo/optimism.png">Optimism</option>
+                <option value="optimism_eth" data-image="cryptologo/optimism.png">Optimism Network</option>
+                <option value="lido" data-image="cryptologo/lido_dao.png">Lido
+                Dao</option>
+                <option value="steth"
+                data-image="cryptologo/steth.png">Lido Staked Ether</option>
+                <option value="usdt_erc20" data-image="cryptologo/tether.png">USDT_ERC20</option>
+                <option value="weth" data-image="cryptologo/wethereum.png">WETH</option>
+        </select>
+        <p class="estimatedamount" id="estimatedAmount">0</p>
+    </div>
+    
+    <div align="center">
+        <div class="divjup2">
+        <p>Pair :</p>
+        <img id="networkIcon" src="" alt="Network Icon"width="35px"align="center"class="bundar">
+        <img id="networkIcon2" src="" alt="Network Icon"width="35px"align="center"class="bundar">
+        <p id="price"> <span>Price: </span></p>
+        </div>
+        
+        <div id="countdown">Next Price Update In: 5s</div>
+        
+        <button id="swapButton" class="button">Swap</button>
+        <div id="routerWarning" style="color: orange; margin-top: 10px; display: none; font-weight: bold;">
+    ⚠ No Router available for this swap. You will be redirected to the bridge.
+</div>
+
+        
+        <p><i class="fas fa-gas-pump" style="color: #3b82f6; margin-right: 5px;"></i> Network Fee: <span id="gasFee"></span></p>
+    </div>
+    
+    <br>
+    
+    <div id="lastUpdate">Last Updated: N/A</div>
+    <a href="explorer.html">| Explorer |</a>
+    <a href="index.html">| Wallet |</a>
+</div>
+
+    <br>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="iacdex.js"></script>
+</body>
+</html>
