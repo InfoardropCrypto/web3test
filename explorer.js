@@ -42,7 +42,7 @@ function filterTransactions(query, transactions) {
             senderStr.includes(query) ||
             recipientStr.includes(query) ||
             amountStr.includes(query) ||
-            amountReceived.includes(query) ||
+            amountReceivedStr.includes(query) ||
             memoStr.includes(query) ||
             gasFeeStr.includes(query) ||
             timestampStr.includes(query)
@@ -203,29 +203,17 @@ function displayTransactions(transactions) {
     }
 }
 
-// Call the function to display transactions
-firebase.auth().onAuthStateChanged(user => {
-    if (user) {
-        handleSearch(); // Display transactions on load
-    } else {
-        if (transactionsContainer) {
-            transactionsContainer.innerHTML = '<p>Please sign in to view transactions.</p>';
-        }
-    }
-});
-
-
-// Function to handle search input
-function handleSearch() {
-    const query = searchInput.value.toLowerCase();
-    const userId = firebase.auth().currentUser.uid;
+// Function to handle search input and real-time updates
+function setupRealtimeTransactions() {
     const transactionsRef = database.ref(`transactions/allnetwork`);
 
-    transactionsRef.once('value', snapshot => {
+    // Use 'on' for real-time updates
+    transactionsRef.on('value', snapshot => {
         const transactions = snapshot.val();
+        const query = searchInput.value.toLowerCase();
         const filteredTransactions = filterTransactions(query, transactions);
         displayTransactions(filteredTransactions);
-    }).catch(error => {
+    }, error => {
         transactionsContainer.innerHTML = `<p>Error fetching transactions: ${error.message}</p>`;
     });
 }
@@ -245,12 +233,15 @@ function generateExplorerUrl(network, transactionHash) {
 }
 
 // Add event listener to search input
-searchInput.addEventListener('input', handleSearch);
+searchInput.addEventListener('input', () => {
+    // When the search input changes, trigger the real-time update logic
+    setupRealtimeTransactions(); 
+});
 
-// Call the function to display transactions
+// Call the function to set up real-time transaction updates
 firebase.auth().onAuthStateChanged(user => {
     if (user) {
-        handleSearch(); // Display transactions on load
+        setupRealtimeTransactions(); // Setup real-time listener on load
     } else {
         transactionsContainer.innerHTML = '<p>Please sign in to view transactions.</p>';
     }
