@@ -9,12 +9,10 @@ const firebaseConfig = {
     measurementId: "G-H8W6VMJJPH"
   };
 
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const database = firebase.database();
 
-// DOM elements
 const userIdElement = document.getElementById('userId');
 const cryptoBalanceElement = document.getElementById('cryptoBalance');
 const cryptoAddressElement = document.getElementById('cryptoAddress');
@@ -88,39 +86,37 @@ function updateTokenBalance() {
     });
 }
 
-// Define ticker map
 const tickerMap = {
-    ac: 'AC',
     eth: 'ETH',
     usdt_erc20: 'USDT',
     usdc_erc20: 'USDC',
     weth: 'WETH',
     lido: 'LIDO',
-    steth: 'sETH',
+    steth: 'StETH',
     optimism_eth: 'ETH',
     optimism: 'OP',
+    sol: 'SOL',
+    cosmos: 'ATOM',
 };
 
-// Define gas fee range
 const gasFeeRanges = {
-    ac: [0.005, 0.001],
     eth: [0.000151836, 0.0000501735],
     lido: [0.01, 0.01],
-    weth: [0.01, 0.01],
-    steth: [0.01, 0.01],
+    weth: [0.00035, 0.00034],
+    steth: [0.0035, 0.00034],
     usdc_erc20: [0.01, 0.01],
     usdt_erc20: [0.01, 0.01],
-    optimism_eth: [0.000005, 0.000002],
+    optimism_eth: [0.0000005, 0.0000002],
     optimism: [0.0005, 0.0001],
+    sol: [0.002, 0.0025],
+    cosmos: [0.005,0.003]
 };
 
-// Fungsi untuk mendapatkan gas fee acak dalam rentang yang ditentukan
 function getRandomGasFee(network) {
     const [min, max] = gasFeeRanges[network];
     return (Math.random() * (max - min) + min).toFixed(7);
 }
 
-// Display wallet or authentication UI based on user state
 firebase.auth().onAuthStateChanged(user => {
     if (user) {
         authContainer.style.display = 'none';
@@ -133,20 +129,16 @@ firebase.auth().onAuthStateChanged(user => {
     }
 });
 
-// Show sign up form
 showSignUpForm.addEventListener('click', () => {
     document.getElementById('signInForm').style.display = 'none';
     document.getElementById('signUpForm').style.display = 'block';
 });
 
-// Show sign in form
 showSignInForm.addEventListener('click', () => {
     document.getElementById('signInForm').style.display = 'block';
     document.getElementById('signUpForm').style.display = 'none';
 });
 
-// Sign Up
-// Pastikan validasi untuk input email dan password
 signUpSubmit.addEventListener('click', () => {
     const email = document.getElementById('signUpEmail').value;
     const password = document.getElementById('signUpPassword').value;
@@ -175,8 +167,6 @@ function validateEmail(email) {
     return re.test(email);
 }
 
-
-// Sign In
 signInSubmit.addEventListener('click', () => {
     const email = document.getElementById('signInEmail').value;
     const password = document.getElementById('signInPassword').value;
@@ -189,11 +179,10 @@ signInSubmit.addEventListener('click', () => {
         });
 });
 
-// Sign Out
 signOutButton.addEventListener('click', () => {
     firebase.auth().signOut().then(() => {
         console.log('Sign out successful');
-        stopGasFeeSync(); // Stop syncing when signed out
+        stopGasFeeSync();
     }).catch(error => {
         console.error('Sign out error:', error);
     });
@@ -207,7 +196,6 @@ function updateWallet() {
     const balanceRef = firebase.database().ref(`wallets/${userId}/${selectedNetwork}/balance`);
     const gasFeeRef = firebase.database().ref(`gasprice/${selectedNetwork}/gasFee`);
 
-    // Update Address
     addressRef.once('value').then(snapshot => {
         let address = snapshot.val();
         if (!address) {
@@ -217,11 +205,9 @@ function updateWallet() {
         cryptoAddressElement.textContent = address;
     });
 
-// Update Balance
 balanceRef.on('value', snapshot => {
     let balance = snapshot.val() || 0;
     
-    // Ubah format balance menjadi 1 angka di belakang desimal dengan pemisah ribuan
     balance = parseFloat(balance).toLocaleString('en-US', { 
         minimumFractionDigits: 10, 
         maximumFractionDigits: 10, 
@@ -233,7 +219,6 @@ balanceRef.on('value', snapshot => {
     tokenBalanceElement.textContent = `Token Balance: ${balance}`;
 });
 
-    // Update Gas Fee
     gasFeeRef.on('value', snapshot => {
         const gasFee = snapshot.val() || getRandomGasFee(selectedNetwork);
         gasFeeRef.set(gasFee);
@@ -246,55 +231,47 @@ function generateRandomAddress(network) {
     let address = '';
     
     if (network === 'btc') {
-        address = '1' + generateRandomChars(34); // Bitcoin addresses start with 1
+        address = '1' + generateRandomChars(34);
     } else if (network === 'sol' || network === 'jup' || network === 'usdc_sol' || network === 'usdt_sol') {
         if (!localStorage.getItem('solana')) {
-            // Generate and store a new address if not already present
-            address = '' + generateRandomChars(32); // Panjang 32 karakter
+            address = '' + generateRandomChars(32);
             localStorage.setItem('solana', address);
         } else {
-            // Retrieve the existing address
             address = localStorage.getItem('solana');
         }
     }  else if (network === 'sui') {
-        address = '0x' + generateRandomChars(64); // Example length for Sui
+        address = '0x' + generateRandomChars(64);
     } else if (network === 'ton' || network === 'dogs') {
         if (!localStorage.getItem('tonnetwork')) {
-            // Generate and store a new address if not already present
-            address = 'UQ' + generateRandomChars(46); // Panjang 46 karakter
+            address = 'UQ' + generateRandomChars(46);
             localStorage.setItem('tonnetwork', address);
         } else {
-            // Retrieve the existing address
+            
             address = localStorage.getItem('tonnetwork');
         }
     } else if (network === 'xrp' ) {
         if (!localStorage.getItem('xrpnetwork')) {
-            // Generate and store a new address if not already present
+
             address = 'r' + generateRandomChars(35);
             localStorage.setItem('xrpnetwork', address);
         } else {
-            // Retrieve the existing address
             address = localStorage.getItem('xrpnetwork');
         }
     } else if (network === 'celestia') {
-        address = 'celestia' + generateRandomChars(39); // Example length for Celestia
+        address = 'celestia' + generateRandomChars(39);
     } else if (network === 'cardano') {
-        address = 'addr1' + generateRandomChars(99); // Example length for Celestia
+        address = 'addr1' + generateRandomChars(99);
     } else if (network === 'tron' || network === 'usdt_trc20') {
-        // Generate a common address for both TRON and USDT TRC20
         if (!localStorage.getItem('trc20')) {
-            // Generate and store a new address if not already present
-            address = 'TP' + generateRandomChars(34); // Panjang 34 karakter untuk TRON dan USDT TRC20
+            address = 'TP' + generateRandomChars(34);
             localStorage.setItem('trc20', address);
         } else {
-            // Retrieve the existing address
             address = localStorage.getItem('trc20');
         }
     } else {
-        // Single address for all EVM networks
         address = localStorage.getItem('evmAddress');
         if (!address) {
-            address = '0x' + generateRandomChars(40); // EVM addresses start with 0x
+            address = '0x' + generateRandomChars(40);
             localStorage.setItem('evmAddress', address);
         }
     }
@@ -312,7 +289,6 @@ function generateRandomChars(length) {
 }
 
 sendCryptoButton.addEventListener('click', () => {
-    // Konfirmasi transaksi menggunakan dialog confirm bawaan
     if (!confirm("Are you sure you want to send crypto?")) {
         showNotification("Transaction cancelled.", 2000);
         return;
@@ -336,12 +312,10 @@ sendCryptoButton.addEventListener('click', () => {
         return;
     }
 
-    // Ambil saldo pengirim dan biaya gas
     const userBalanceRef = firebase.database().ref(`wallets/${userId}/${selectedNetwork}/balance`);
     const gasFee = parseFloat(gasFeeElement.textContent.split(' ')[0]) || 0;
     const totalCost = amount + gasFee;
 
-    // Dapatkan RPC yang dipilih untuk menentukan delay
     const selectedRpcUrl = document.getElementById("selectrpc").value;
     let delay = 0;
     if (selectedRpcUrl === "https://rpc-iaconchain.io") {
@@ -356,14 +330,11 @@ sendCryptoButton.addEventListener('click', () => {
         const currentBalance = snapshot.val() || 0;
 
         if (currentBalance >= totalCost) {
-            // Kurangi saldo pengirim
             userBalanceRef.set(currentBalance - totalCost).then(() => {
-                // Tambah saldo penerima
                 const recipientRef = firebase.database().ref(`wallets/${recipientAddress}/${selectedNetwork}/balance`);
                 recipientRef.once('value').then(snapshot => {
                     const recipientBalance = snapshot.val() || 0;
                     recipientRef.set(recipientBalance + amount).then(() => {
-                        // Simpan transaksi
                         const transactionHash = generateTransactionHash();
                         const transactionRef = firebase.database().ref(`transactions/allnetwork/${transactionHash}`);
 
@@ -379,7 +350,6 @@ sendCryptoButton.addEventListener('click', () => {
                         };
 
                         transactionRef.set(transactionData).then(() => {
-                            // Simulasikan delay pengiriman transaksi
                             setTimeout(() => {
                                 const explorerUrl = generateExplorerUrl(selectedNetwork, transactionHash);
                                 showNotification(`Crypto sent successfully! View: ${explorerUrl}`, 4000);
@@ -397,11 +367,10 @@ sendCryptoButton.addEventListener('click', () => {
     });
 });
 
-// Fungsi untuk membuat hash transaksi acak (untuk simulasi)
 function generateTransactionHash() {
     const chars = 'abcdef0123456789';
     let hash = '';
-    for (let i = 0; i < 64; i++) { // Panjang hash 64 karakter (mirip dengan hash blockchain sebenarnya)
+    for (let i = 0; i < 64; i++) {
         hash += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return hash;
@@ -425,12 +394,10 @@ function generateExplorerUrl(network, transactionHash) {
     return `${baseUrl}${transactionHash}`;
 }
 
-// Change network
 networkSelect.addEventListener('change', () => {
     updateWallet();
 });
 
-// Track and update gas fee every 3 seconds
 let gasFeeInterval;
 
 function startGasFeeSync() {
@@ -438,7 +405,7 @@ function startGasFeeSync() {
         const selectedNetwork = networkSelect.value;
         const gasFeeRef = firebase.database().ref(`gasprice/${selectedNetwork}/gasFee`);
         gasFeeRef.set(getRandomGasFee(selectedNetwork));
-    }, 10000); // Update every 10 seconds
+    }, 10000);
 }
 
 function stopGasFeeSync() {
@@ -460,7 +427,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
         });
-        // Function to toggle password visibility
         function togglePassword(id, button) {
             const passwordInput = document.getElementById(id);
             const type = passwordInput.type === 'password' ? 'text' : 'password';
@@ -472,25 +438,21 @@ document.addEventListener("DOMContentLoaded", function () {
   const rpcSelect = document.getElementById("selectrpc");
   const rpcSpeedDisplay = document.getElementById("rpcSpeed");
 
-  // Mapping rentang kecepatan berdasarkan URL RPC
   const customSpeedMapping = {
     "https://rpc-iaconchain.io": { min: 250, max: 800 },
     "https://rpc-ac-mainnet.com": { min: 300, max: 800 },
     "https://rpc.ankr.com": { min: 700, max: 800 }
   };
 
-  // Fungsi untuk menghasilkan angka acak antara min dan max (inklusif)
   function getRandomSpeed(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  // Fungsi untuk memperbarui tampilan kecepatan secara acak
   function updateRpcSpeedDisplay() {
     const selectedRpc = rpcSelect.value;
     const speedRange = customSpeedMapping[selectedRpc];
 
     if (speedRange) {
-      // Hasilkan nilai acak dalam rentang
       const randomSpeed = getRandomSpeed(speedRange.min, speedRange.max);
       rpcSpeedDisplay.textContent = `${randomSpeed} ms`;
     } else {
@@ -498,10 +460,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Tampilkan kecepatan saat halaman dimuat
   updateRpcSpeedDisplay();
 
-  // Perbarui tampilan setiap kali opsi RPC berubah
   rpcSelect.addEventListener("change", updateRpcSpeedDisplay);
 });
 
@@ -514,7 +474,6 @@ function showNotification(message, duration = 10000) {
   notification.textContent = message;
   notification.classList.add('show');
 
-  // Hapus notifikasi setelah durasi tertentu
   setTimeout(() => {
     notification.classList.remove('show');
   }, duration);
