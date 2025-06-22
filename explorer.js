@@ -8,24 +8,17 @@ const firebaseConfig = {
     appId: "1:462702808978:web:843402ceb14d9eb026bb4b",
     measurementId: "G-H8W6VMJJPH"
   };
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
-
-// DOM elements
 const transactionsContainer = document.getElementById('transactionsContainer');
 const searchInput = document.getElementById('searchInput');
 const totalTransactionsElement = document.getElementById('totalTransactions');
 const dailyTransactionsElement = document.getElementById('dailyTransactions');
 const totalGasFeeElement = document.getElementById('totalGasFee');
 const networkDetailsElement = document.getElementById('networkDetails');
-
-// Function to filter transactions based on search query
 function filterTransactions(query, transactions) {
     return Object.keys(transactions).filter(transactionId => {
         const transaction = transactions[transactionId];
-        
-        // Convert values to string and then apply toLowerCase
         const transactionIdStr = transactionId.toLowerCase();
         const networkStr = (transaction.network || '').toLowerCase();
         const senderStr = (transaction.sender || '').toLowerCase();
@@ -53,10 +46,9 @@ function filterTransactions(query, transactions) {
     }, {});
 }
 
-// Function to display transactions
 function displayTransactions(transactions) {
     if (transactionsContainer) {
-        transactionsContainer.innerHTML = ''; // Clear previous transactions
+        transactionsContainer.innerHTML = ''; 
     }
 
     let totalTransactions = 0;
@@ -65,7 +57,6 @@ function displayTransactions(transactions) {
     let networkTotals = {};
 
     if (transactions && Object.keys(transactions).length > 0) {
-        // Sort transactions by timestamp in descending order
         const sortedTransactionIds = Object.keys(transactions).sort((a, b) => {
             return new Date(transactions[b].timestamp) - new Date(transactions[a].timestamp);
         });
@@ -79,11 +70,12 @@ function displayTransactions(transactions) {
     const sender = transaction.sender || 'anonym';
     const recipient = transaction.recipient || 'anonym';
     const memo = transaction.memo || 'encrypted';
+    const gasFeeInSmallestUnit = (parseFloat(transaction.gasFee) || 0) * 1e18;
 
     const transactionElement = document.createElement('div');
     transactionElement.className = 'transaction';
     transactionElement.innerHTML = `
-        <p><strong>Tx hash:</strong> <span class="long-text">${transactionId}</span></p>
+        <p><strong>Tx hash:</strong> <span class="long-text" id="tx-${transactionId}">${transactionId}</span> <button onclick="copyToClipboard('${transactionId}')">Copy</button></p>
         <p><strong>Type:</strong> ${
             transaction.type === 'swap'
                 ? 'swap'
@@ -95,19 +87,23 @@ function displayTransactions(transactions) {
                 ? 'unstake'
                 : transaction.type === 'claim'
                 ? 'claim'
-                : transaction.type === 'lupypump'
-                ? 'lupypump'
+                : transaction.type === 'vote'
+                ? 'vote'
                 : transaction.type === 'mining'
                 ? 'mining'
                 : 'send crypto'
         }</p>
-        <p><strong>Source:</strong> ${transaction.network}</p>
         <p><strong>Sender:</strong> ${sender}</p>
         <p><strong>Recipient:</strong> ${recipient}</p>
-        <p><strong>Send:</strong> ${transaction.amount}</p>
-        <p><strong>Received:</strong> ${transaction.amountReceived}</p>
+         <p style="color:#7f7e7ecf;">################################</p>
+        <p><strong>Balance Change</strong></p>
+        <p><strong>Send:</strong> <font style="color:white;background-color:#cc4d4d;border-radius:100px;">⤴</font>${transaction.amount}</p>
+        <p><strong>Received:</strong> <font style="color:white;background-color:#4dcc4d;border-radius:100px;">⤵</font>${transaction.amountReceived}</p>
+        <p><strong>Source:</strong> ${transaction.network}</p>
+        <p style="color:#7f7e7ecf;">################################</p>
         <p><strong>Memo:</strong> ${memo}</p>
         <p><strong>Gas fee:</strong> ${transaction.gasFee}</p>
+        <p><strong>Gwei:</strong> 0.000000000000000001♦»<strong>ATOM:</strong> ${gasFeeInSmallestUnit.toFixed(0)}⚛</p>
         <p><strong>Success : </strong><a style="color:green;font-family:monospace;">true</a></p>
         <p><strong>Time:</strong> ${new Date(transaction.timestamp).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })} ${new Date(transaction.timestamp).toLocaleDateString('en-GB')}</p>
         <hr>
@@ -121,7 +117,6 @@ function displayTransactions(transactions) {
             }
             totalGasFee += parseFloat(transaction.gasFee) || 0;
 
-            // Update network totals
             const network = transaction.network;
             if (!networkTotals[network]) {
                 networkTotals[network] = 0;
@@ -129,7 +124,6 @@ function displayTransactions(transactions) {
             networkTotals[network]++;
 });
 
-        // Update totals display
         if (totalTransactionsElement) {
             totalTransactionsElement.innerHTML = `
                 <details class="detailstx">
@@ -155,7 +149,6 @@ function displayTransactions(transactions) {
             `;
         }
 
-        // Display network totals
         if (networkDetailsElement) {
             let networkDetailsHtml = '<details class="detailstx"><summary>Transaction Totals by Network</summary><div>';
             for (const [network, count] of Object.entries(networkTotals)) {
@@ -203,16 +196,15 @@ function displayTransactions(transactions) {
     }
 }
 
-// Function to handle search input and real-time updates
 function setupRealtimeTransactions() {
     const transactionsRef = database.ref(`transactions/allnetwork`);
 
-    // Use 'on' for real-time updates
     transactionsRef.on('value', snapshot => {
         const transactions = snapshot.val();
         const query = searchInput.value.toLowerCase();
         const filteredTransactions = filterTransactions(query, transactions);
         displayTransactions(filteredTransactions);
+
     }, error => {
         transactionsContainer.innerHTML = `<p>Error fetching transactions: ${error.message}</p>`;
     });
@@ -232,39 +224,61 @@ function generateExplorerUrl(network, transactionHash) {
     return `${baseUrl}${transactionHash}`;
 }
 
-// Add event listener to search input
 searchInput.addEventListener('input', () => {
-    // When the search input changes, trigger the real-time update logic
     setupRealtimeTransactions(); 
 });
 
-// Call the function to set up real-time transaction updates
 firebase.auth().onAuthStateChanged(user => {
     if (user) {
-        setupRealtimeTransactions(); // Setup real-time listener on load
+        setupRealtimeTransactions();
     } else {
         transactionsContainer.innerHTML = '<p>Please sign in to view transactions.</p>';
     }
 });
 
-function updateGasFee() {
+function updateGasFeeETH() {
     var gasFeeRef = database.ref('gasprice/eth/gasFee');
 
     gasFeeRef.on('value', function(snapshot) {
-        var gasFeeInEth = snapshot.val(); // Data dari Firebase dalam ETH
+        var gasFeecv2 = snapshot.val();
 
-        if (gasFeeInEth !== null) {
-            gasFeeInEth = parseFloat(gasFeeInEth); // Pastikan nilainya angka
+        if (gasFeecv2 !== null) {
+            gasFeecv2 = parseFloat(gasFeecv2);
 
-            var gasFeeInGwei = gasFeeInEth * 1e8; // Konversi ETH ke Gwei
+            var gasFeeInGwei = gasFeecv2 * 1e8;
 
             document.getElementById("gasFee").innerText = 
-                gasFeeInGwei.toLocaleString() + " Gwei (~" + gasFeeInEth.toFixed(5) + " ETH)";
+                gasFeeInGwei.toLocaleString() + " Gwei (~" + gasFeecv2.toFixed(18) + " ETH)";
         } else {
             document.getElementById("gasFee").innerText = "Not Found";
         }
     });
 }
 
-// Panggil fungsi updateGasFee saat halaman dimuat
-document.addEventListener("DOMContentLoaded", updateGasFee);
+function updateGasFeeATOM() {
+    var gasFeeRef = database.ref('gasprice/cosmos/gasFee');
+
+    gasFeeRef.on('value', function(snapshot) {
+        var gasFeecv2 = snapshot.val();
+
+        if (gasFeecv2 !== null) {
+            gasFeecv2 = parseFloat(gasFeecv2);
+
+            var gasFeeInGwei = gasFeecv2 * 1e8;
+
+            document.getElementById("gasFeeatom").innerText = 
+                gasFeeInGwei.toLocaleString() + " ATOM (~" + gasFeecv2.toFixed(8) + " ATOM)";
+        } else {
+            document.getElementById("gasFee").innerText = "Not Found";
+        }
+    });
+}
+
+document.addEventListener("DOMContentLoaded", updateGasFeeETH);
+document.addEventListener("DOMContentLoaded", updateGasFeeATOM);
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Copied to clipboard: ' + text);
+    });
+}
