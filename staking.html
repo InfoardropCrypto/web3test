@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iac.icfinance.io</title>
-    <link rel="stylesheet" href="staking.css"> 
+    <title>ICfinance</title>
+    <link rel="stylesheet" href="staking.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
@@ -15,12 +15,14 @@
 
     <div id="stakingContainer" style="display: none;">
         <nav class="logo-container">
-            <h1>IAC | STAKE</h1>
+            <h1>IAC | STAKE & VOTE</h1>
             <select id="networkSelect">
-        <option value="steth" data-image="cryptologo/.png">Lido Staked Ethe</option>
-        <option value="eth" data-image="cryptologo/ethereum.png">Ethereum</option>
-        <option value="optimism" data-image="cryptologo/optimism.png">Optimism</option>
-    </select>
+                <option value="steth" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/8085.png">Lido Staked Ether</option>
+                <option value="eth" data-image="https://raw.githubusercontent.com/InfoardropCrypto/iac/refs/heads/main/cryptologo/ethereum.png">Ethereum</option>
+                <option value="optimism" data-image="https://raw.githubusercontent.com/InfoardropCrypto/iac/refs/heads/main/cryptologo/optimism.png">Optimism</option>
+                <option value="sol" data-image="https://raw.githubusercontent.com/InfoardropCrypto/iac/refs/heads/main/cryptologo/solana.jpg">Solana</option>
+                <option value="sui" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/20947.png">Sui</option>
+            </select>
             <button id="connectWalletButton" class="button" onclick="confirm('Connected')">Connected</button>
             <button id="themeToggle" class="icon-button">
                 <i class="fas fa-sun" id="themeIcon"></i>
@@ -32,35 +34,29 @@
             <div>
               <img id="networkIcon" src="iac.png" alt=" Icon " style="text-align:;border-radius:100%;width:20px;">
               <p>Wallet Balance : <span id="walletBalance">0.0000</span> <span id="selectedNetwork">Loading...</span></p>
-              
-              </div>
+            </div>
         </div>
 
         <div class="stake-form">
+            <h2>STAKE TOKENS</h2>
             <input type="number" id="stakeAmount" step="0.0001" placeholder="Stake amount">
-            <input type="number" id="stakeDuration" placeholder="Enter duration">
-            
-            <div>
-            </div>
+            <input type="number" id="stakeDuration" placeholder="Enter duration in days">
             
             <label for="validatorSelect">Pilih Validator:</label>
-<select id="validatorSelect">
-  
-  <option value=""></option>
-  <option value="ethereum.org" data-apy="5">ethereum.org </option>
-  <option value="optimism.org" data-apy="100">optimism.org</option>
-  <option value="lido.fi" data-apy="2.9">lido.fi</option>
-</select>
+            <select id="validatorSelect">
+              <option value="">-- Select Validator --</option>
+              <option value="mining.js" data-apy="200">Mining.js</option>
+              <option value="ethereum.org" data-apy="5">Ethereum</option>
+              <option value="optimism.org" data-apy="15">Optimism</option>
+              <option value="lido.fi" data-apy="2.9">Lido</option>
+              <option value="coinbase.com" data-apy="30">Coinbase</option>
+              <option value="solanabeach.io" data-apy="20">SolanaBeach</option>
+            </select>
 
-<div id="currentApyDisplay">APY: -</div>
-
-<p><strong>Estimasi Reward : </strong><a id="estimatedReward">0</a></p>
-
-
+            <div id="currentApyDisplay">APY: -</div>
+            <p><strong>Estimasi Reward : </strong><a id="estimatedReward">0</a></p>
             
             <button id="stakeButton" class="stake-button">Stake</button>
-            
-            
             <p id="stakingResult" class="staking-result"></p>
         </div>
 
@@ -68,8 +64,27 @@
             <h3>Current Stakes:</h3>
         </div>
 
-        <div>
+        <hr style="margin: 40px 20px;">
+
+        <div class="governance-section">
+            <h2>GOVERNANCE</h2>
             
+            <div class="create-vote-section" style="display:none;">
+                <h3>Create a New Proposal</h3>
+                <input type="text" id="proposalTitle" placeholder="Proposal Title">
+                <textarea id="proposalDescription" rows="4" placeholder="Describe your proposal..."></textarea>
+                <button id="createProposalButton">Create Proposal</button>
+                <p id="proposalResult"></p>
+            </div>
+            
+            <p><strong>Your Voting Power:</strong> <span id="votingPower">0</span></p>
+
+            <div class="vote-section">
+                <h3>Active Proposals</h3>
+                <div id="proposalsList">
+                    <p>Loading proposals...</p>
+                </div>
+            </div>
         </div>
     </div>
 
