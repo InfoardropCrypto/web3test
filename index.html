@@ -63,10 +63,16 @@
                 
                 <option value="weth" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/2396.png">WETH</option>
                 <option value="optimism_eth" data-image="https://raw.githubusercontent.com/InfoardropCrypto/iac/refs/heads/main/cryptologo/optimism.png">Optimism Network</option>
+                <option value="base_eth" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/27716.png">Base Network</option>
                 <option value="optimism" data-image="https://raw.githubusercontent.com/InfoardropCrypto/iac/refs/heads/main/cryptologo/optimism.png">Optimism</option>
                 <option value="sol" data-image="https://raw.githubusercontent.com/InfoardropCrypto/iac/refs/heads/main/cryptologo/solana.jpg">Solana</option>
+                <details>
+                <option value="jup" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/29210.png">Jupiter</option>
+                </details>
                 <option value="cosmos" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/3794.png">Cosmos</option>
-                
+                <option value="sui" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/20947.png">Sui</option>
+                <option value="pepe" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/24478.png">Pepe</option>
+                <option value="supra" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/34240.png">Supra</option>
             </select>
         </div>
 
@@ -80,8 +86,6 @@
         
         <div id="notification" class="notification"></div>
 
-        
-        <!-- Send Crypto Section -->
         <div>
           <details>
             <summary>Send Crypto</summary>
@@ -93,15 +97,14 @@
             <input type="text" id="memo" placeholder="Memo (optional)" aria-label="Memo">
             </details>
             <input type="text" id="tokenBalance" style="display: none;">
-            <!-- Tombol Send Crypto -->
             <button id="sendCrypto" type="button">➤</button>
             
             <div id="confirmationModal" class="modal" style="display:none;">
               
             <div class="modal-content">
     <p>Are you sure you want to send crypto?</p>
-    <button id="confirmSend" type="button">Send</button>
     <button id="cancelSend" type="button">Cancel</button>
+    <button id="confirmSend" type="button">Send</button>
   </div>
 </div>
 
