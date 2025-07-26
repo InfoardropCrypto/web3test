@@ -1,7 +1,7 @@
 {
-  "name": "IAC Web3 Test Wallet",
-  "short_name": "IACWallet",
-  "start_url": "/index.html",
+  "name": "IAC Web Test",
+  "short_name": "iac wallet#2psh",
+  "start_url": "/web3test",
   "display": "standalone",
   "background_color": "#122537",
   "theme_color": "#122537",
