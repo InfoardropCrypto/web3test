@@ -19,10 +19,6 @@
         <p id="networkAddress" style="font-size:10px;display:none;">Network Address: N/A</p>
     </nav>
     
-    <div style="height:90px;"></div>
-    
-    <!-- Swap Section -->
-    
     <div style="height:30px;"></div>
 
     <div id="swapSection"> 
@@ -34,28 +30,34 @@
         </select>
     </div>
 
-    <br>
-
     <div class="divjup">
     <p id="fromBalance">You're Selling </p>
     <label for="fromNetwork"></label>
     <select id="fromNetwork">
-        <option value="eth" data-image="cryptologo/ethereum.png">
+        <option value="eth" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png">
           Ethereum
         </option>
-        <option value="optimism_eth" data-image="cryptologo/optimism.png">Optimism Network</option>
-        <option value="optimism" data-image="cryptologo/optimism.png">Optimism</option>
-        <option value="lido" data-image="cryptologo/lido_dao.png">Lido Dao</option>
-        <option value="steth" data-image="cryptologo/steth.png">Lido Staked Ether</option>
-        <option value="usdc_erc20" data-image="cryptologo/usdc.png">USDC_ERC20</option>
-        <option value="usdt_erc20" data-image="cryptologo/tether.png">USDT_ERC20</option>
-        <option value="weth" data-image="cryptologo/wethereum.png">WETH</option>
-        
+        <option value="optimism_eth" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/11840.png">Optimism Network</option>
+        <option value="base_eth" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/27716.png">Base Network</option>
+        <option value="optimism" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/11840.png">Optimism</option>
+        <option value="lido" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/8000.png">Lido Dao</option>
+        <option value="steth" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/8085.png">Lido Staked Ether</option>
+        <option value="usdc_erc20" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png">USDC_ERC20</option>
+        <option value="usdt_erc20" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/825.png">USDT_ERC20</option>
+        <option value="weth" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/2396.png">WETH</option>
+        <option value="sol" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/5426.png">Solana</option>
+        <option value="jup" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/29210.png">Jupiter</option>
+        <option value="cosmos" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/3794.png">Cosmos</option>
+        <option value="pepe" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/24478.png">Pepe</option>
+        <option value="supra" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/34240.png">Supra</option>
+        <option value="sui" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/20947.png">Sui</option>
+        <option value="walrus" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/36119.png">Walrus</option>
     </select>
 
     <input type="number" class="inputjup" id="amount" step="any" placeholder="0.00">
+    <p id="afterBalance" style="font-size:12px;color:#00ffa2;margin-top:-5px;"></p>
+
     
-    <!-- Tombol Pilihan Persentase -->
     <div class="percentage-buttons">
         <button onclick="setPercentage(25)">25%</button>
         <button onclick="setPercentage(50)">50%</button>
@@ -70,16 +72,23 @@
         <p id="toBalance">You're Buying </p>
         <label for="toNetwork"></label>
         <select id="toNetwork">
-               <option value="usdc_erc20" data-image="cryptologo/usdc.png">USDC_ERC20</option>
-                <option value="eth" data-image="cryptologo/ethereum.png">Ethereum</option>
-                <option value="optimism" data-image="cryptologo/optimism.png">Optimism</option>
-                <option value="optimism_eth" data-image="cryptologo/optimism.png">Optimism Network</option>
-                <option value="lido" data-image="cryptologo/lido_dao.png">Lido
+               <option value="usdc_erc20" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png">USDC_ERC20</option>
+                <option value="eth" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png">Ethereum</option>
+                <option value="optimism" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/11840.png">Optimism</option>
+                <option value="base_eth" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/27716.png">Base Network</option>
+                <option value="optimism_eth" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/11840.png">Optimism Network</option>
+                <option value="lido" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/8000.png">Lido
                 Dao</option>
                 <option value="steth"
-                data-image="cryptologo/steth.png">Lido Staked Ether</option>
-                <option value="usdt_erc20" data-image="cryptologo/tether.png">USDT_ERC20</option>
-                <option value="weth" data-image="cryptologo/wethereum.png">WETH</option>
+                data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/8085.png">Lido Staked Ether</option>
+                <option value="usdt_erc20" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/825.png">USDT_ERC20</option>
+                <option value="sol" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/5426.png">Solana</option>
+                <option value="jup" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/29210.png">Jupiter</option>
+                <option value="cosmos" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/3794.png">Cosmos</option>
+                <option value="pepe" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/24478.png">Pepe</option>
+                <option value="supra" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/34240.png">Supra</option>
+                <option value="sui" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/20947.png">Sui</option>
+                <option value="walrus" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/36119.png">Walrus</option>
         </select>
         <p class="estimatedamount" id="estimatedAmount">0</p>
     </div>
@@ -95,9 +104,8 @@
         <div id="countdown">Next Price Update In: 5s</div>
         
         <button id="swapButton" class="button">Swap</button>
-        <div id="routerWarning" style="color: orange; margin-top: 10px; display: none; font-weight: bold;">
-    ⚠ No Router available for this swap. You will be redirected to the bridge.
-</div>
+        <div id="amountWarning"></div>
+        
 
         
         <p><i class="fas fa-gas-pump" style="color: #3b82f6; margin-right: 5px;"></i> Network Fee: <span id="gasFee"></span></p>
@@ -108,9 +116,230 @@
     <div id="lastUpdate">Last Updated: N/A</div>
     <a href="explorer.html">| Explorer |</a>
     <a href="index.html">| Wallet |</a>
+    <a href="#futuresSection">| Futures |</a>
 </div>
 
+ <div id="chartSection" class="feature-section">
+
+    <div class="chart-container">
+        <canvas id="priceChart"></canvas>
+    </div>
+    <div class="chart-controls">
+        <button id="dailyChart" class="button active">24H</button>
+        <button id="weeklyChart" class="button">7D</button>
+        <button id="monthlyChart" class="button">30D</button>
+    </div>
+</div>
+
+<br>
+<div id="futuresSection" class="feature-section">
+    <h2>Futures Trading</h2>
+    
+    <label for="futuresAssetSelect">Select Asset:</label>
+    <select id="futuresAssetSelect">
+        <option value="eth">Ethereum (ETH)</option>
+        <option value="sol">Solana (SOL)</option>
+        <option value="pepe">Pepe (PEPE)</option>
+        <option value="jup">Jupiter (JUP)</option>
+    </select>
+
+    <label for="collateralSelect">Collateral:</label>
+    <select id="collateralSelect">
+        <option value="usdc_erc20">USDC</option>
+        <option value="usdt_erc20">USDT</option>
+    </select>
+    <p id="collateralBalanceDisplay" style="font-size: 12px; color: #A0A0A0; text-align: right; margin: -5px 0 10px 0;">Balance: 0.00</p>
+
+    <label for="leverageSelect">Leverage:</label>
+    <select id="leverageSelect">
+        <option value="5">5x</option>
+        <option value="10">10x</option>
+        <option value="20">20x</option>
+        <option value="50">50x</option>
+        <option value="100">100x</option>
+        <option value="150">150x</option>
+    </select>
+
+    <label for="futuresAmount">Amount:</label>
+    <input type="number" id="futuresAmount" placeholder="0.00" step="any">
+    
+    <label for="takeProfit">Take Profit (Price):</label>
+    <input type="number" id="takeProfit" placeholder="Optional" step="any">
+
+    <label for="stopLoss">Stop Loss (Price):</label>
+    <input type="number" id="stopLoss" placeholder="Optional" step="any">
+
+    <div class="staking-buttons">
+        <button id="longButton">Long</button>
+        <button id="shortButton">Short</button>
+    </div>
+    
+    <div id="futuresResult"></div>
+    <details>
+      <summary>⚠️ Peringatan Risiko</summary>
+      <p>Trading dengan leverage memiliki risiko tinggi. Posisi Anda akan <strong>dilikuidasi secara otomatis</strong> jika kerugian mencapai jumlah collateral awal Anda. TP/SL dan pemeriksaan likuidasi hanya akan dieksekusi saat halaman ini aktif di browser Anda.</p>
+    </details>
+    <div id="openPositionsSection">
+        <h3 style="margin-top: 20px; border-top: 1px solid #444; padding-top: 20px;">Open Positions</h3>
+        <ul id="positionsList">
+            </ul>
+    </div>
+</div>
+<div id="positionsCountdown" style="font-size: 12px; color: #A0A0A0; text-align: right; margin-bottom: 10px;"></div>
+
+<div id="closePositionConfirmationModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Confirm Close Position</h3>
+        </div>
+        <div class="modal-body">
+            <div class="modal-line-item">
+                <span>Asset:</span>
+                <strong id="modalCloseAsset"></strong>
+            </div>
+            <div class="modal-line-item">
+                <span>Type:</span>
+                <strong id="modalCloseType"></strong>
+            </div>
+             <div class="modal-line-item">
+                <span>Entry Price:</span>
+                <strong id="modalCloseEntryPrice"></strong>
+            </div>
+            <div class="modal-line-item">
+                <span>Closing Price:</span>
+                <strong id="modalCloseCurrentPrice"></strong>
+            </div>
+            <hr>
+            <div class="modal-line-item">
+                <span>Estimated PnL:</span>
+                <strong id="modalClosePnl"></strong>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button id="cancelCloseButton" class="button button-secondary">Cancel</button>
+            <button id="confirmCloseButton" class="button close-button">Confirm Close</button>
+        </div>
+    </div>
+</div>
+<br>
+
+    <div id="newListingSection" class="feature-section">
+        <h2>🔥 New Listings</h2>
+        <ul id="newListingsList">
+             <li data-token="sui">
+                <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/20947.png" alt="Sui" class="bundar">
+                <div class="listing-info">
+                    <span class="token-name">Sui</span>
+                    <span class="token-ticker">SUI</span>
+                </div>
+                <button class="button trade-button">Trade</button>
+            </li>
+             <li data-token="supra">
+                <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/34240.png" alt="Supra" class="bundar">
+                <div class="listing-info">
+                    <span class="token-name">Supra</span>
+                    <span class="token-ticker">SUPRA</span>
+                </div>
+                <button class="button trade-button">Trade</button>
+            </li>
+             <li data-token="pepe">
+                <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/24478.png" alt="PEPE" class="bundar">
+                <div class="listing-info">
+                    <span class="token-name">Pepe</span>
+                    <span class="token-ticker">PEPE</span>
+                </div>
+                <button class="button trade-button">Trade</button>
+            </li>
+             <li data-token="sol">
+                <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/5426.png" alt="Solana" class="bundar">
+                <div class="listing-info">
+                    <span class="token-name">Solana</span>
+                    <span class="token-ticker">SOL</span>
+                </div>
+                <button class="button trade-button">Trade</button>
+            </li>
+             <li data-token="cosmos">
+                <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/3794.png" alt="Cosmis" class="bundar">
+                <div class="listing-info">
+                    <span class="token-name">Cosmos</span>
+                    <span class="token-ticker">ATOM</span>
+                </div>
+                <button class="button trade-button">Trade</button>
+            </li>
+             <li data-token="jup">
+                <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/29210.png" alt="Jupiter" class="bundar">
+                <div class="listing-info">
+                    <span class="token-name">Jupiter</span>
+                    <span class="token-ticker">JUP</span>
+                </div>
+                <button class="button trade-button">Trade</button>
+            </li>
+        </ul>
+    </div>
+
     <br>
+
+    <div id="topGainersSection" class="feature-section">
+        <div class="feature-header">
+            <h2>🚀 Top Gainers (24h)</h2>
+            <select id="topGainersCountSelect">
+                <option value="5" selected>Top 5</option>
+                <option value="10">Top 10</option>
+                <option value="15">Top 15</option>
+            </select>
+        </div>
+        <ul id="topGainersList">
+            </ul>
+    </div>
+
+    <br>
+
+    <div id="topLosersSection" class="feature-section">
+        <div class="feature-header">
+            <h2>📉 Top Losers (24h)</h2>
+            <select id="topLosersCountSelect">
+                <option value="5" selected>Top 5</option>
+                <option value="10">Top 10</option>
+                <option value="15">Top 15</option>
+            </select>
+        </div>
+        <ul id="topLosersList">
+            </ul>
+    </div>
+
+    <div id="swapConfirmationModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirm Swap</h3>
+            </div>
+            <div class="modal-body">
+                <div class="modal-line-item">
+                    <span>You are selling:</span>
+                    <strong id="modalFromAmount"></strong>
+                </div>
+                <div class="modal-line-item">
+                    <span>You are buying:</span>
+                    <strong id="modalToAmount"></strong>
+                </div>
+                <hr>
+                <div class="modal-line-item">
+                    <span>Price:</span>
+                    <span id="modalPrice"></span>
+                </div>
+                <div class="modal-line-item">
+                    <span>Network Fee:</span>
+                    <span id="modalGasFee"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="rejectSwapButton" class="button button-secondary">Reject</button>
+                <button id="confirmSwapButton" class="button">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
