@@ -1,14 +1,96 @@
 /* Gaya Umum */
 body {
     font-family: Arial, sans-serif;
-    background-color: #fff;
+    background-color: #f4f4f4;
     color: #212121;
     margin: 0;
     padding: 0;
     text-align: center;
 }
 
-/* Input dan Tombol */
+/* ===== Gaya untuk Kontainer Login ===== */
+#authContainer {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+#authContainer h2 {
+    margin-bottom: 20px;
+}
+
+#authContainer form {
+    display: flex;
+    flex-direction: column;
+}
+
+#authContainer input {
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+#authContainer button {
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    background-color: skyblue;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin: 0;
+}
+
+#authContainer button:hover {
+    background-color: skyblue;
+}
+
+.auth-switch {
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.auth-switch a {
+    color: skyblue;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.auth-switch a:hover {
+    text-decoration: underline;
+}
+
+.error-message {
+    color: #d9534f;
+    margin-top: 15px;
+    font-weight: bold;
+    min-height: 20px;
+}
+
+/* Tombol Auth */
+.auth-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: skyblue;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.auth-button:hover {
+    background-color: skyblue;
+}
+
+/* Input dan Tombol Umum */
 .searchinputjup {
     flex: 1;
     padding: 10px;
@@ -58,12 +140,12 @@ button:hover:not(:disabled) {
 }
 
 .transaction a {
-    color: #007bff;
+    color: skyblue;
     text-decoration: underline;
 }
 
 .transaction a:hover {
-    color: #0056b3;
+    color: skyblue;
 }
 
 /* Detail */
@@ -77,10 +159,34 @@ button:hover:not(:disabled) {
     background-color: #00000084;
 }
 
+/* Gaya untuk dompet pengguna (BARU) */
+.my-wallet {
+    background-color: #0c0c0d8c;
+    border: 1px solid skyblue;
+    color: #fff;
+}
+.my-wallet summary {
+    cursor: pointer;
+    font-weight: bold;
+}
+#myBalanceDetails p {
+  margin: 8px 0;
+  font-family: monospace;
+  font-size: 1.1em;
+  color: #fff; /* Pastikan teks terlihat di background gelap */
+}
+#myBalanceDetails strong {
+  color: #f2bb19; /* Samakan warna dengan detail lainnya */
+}
+
+
 /* Mempool */
 #mempoolContainer {
     padding: 20px;
     background-color: #f9f9f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 /* Footer */
@@ -102,8 +208,130 @@ footer p {
 
 /* Pagination */
 #pagination {
+    padding: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
+}
+
+#pageInfo {
+    font-weight: bold;
+}
+
+/* ===== Gaya untuk Link Wallet ===== */
+.wallet-link {
+    color: skyblue;
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.wallet-link:hover {
+    color: skyblue;
+}
+
+/* ===== Gaya untuk Modal ===== */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 100; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.6);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 10% auto;
+    padding: 25px;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 550px;
+    border-radius: 8px;
+    text-align: left;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+}
+
+@keyframes animatetop {
+  from {top: -300px; opacity: 0}
+  to {top: 0; opacity: 1}
+}
+
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* ===== Gaya untuk Teks Transaksi Terakhir ===== */
+.last-tx {
+    font-size: 0.9em;
+    color: #6c757d;
+    margin-left: 10px;
+    font-family: monospace;
+}
+
+/* ✨ Efek Kelap-Kelip Neon Pixel untuk Transaksi Baru */
+.transaction.new-tx {
+  background-color: #000000;
+  color: #39ff14;
+  border: 2px dotted #39ff14;
+  animation: blinkGlow 1.2s infinite steps(2, start), pixelShift 0.3s infinite;
+  box-shadow: 0 0 4px #39ff14;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes blinkGlow {
+  0%, 100% {
+    background-color: #000000;
+    box-shadow: 0 0 2px #39ff14;
+    color: #39ff14;
+  }
+  50% {
+    background-color: #0a0a0a;
+    box-shadow: 0 0 8px #39ff14;
+    color: #73ff6c;
+  }
+}
+
+@keyframes pixelShift {
+  0% { transform: translate(0px, 0px); }
+  25% { transform: translate(1px, -1px); }
+  50% { transform: translate(-1px, 1px); }
+  75% { transform: translate(1px, 1px); }
+  100% { transform: translate(0px, 0px); }
+}
+
+.new-label {
+  position: static;
+  top: 8px;
+  right: 10px;
+  background-color: skyblue;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 5px;
+  animation: blinkLabel 1.2s infinite steps(2, start);
+  box-shadow: 0 0 5px skyblue;
+  z-index: 10;
+}
+
+@keyframes blinkLabel {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
 }
