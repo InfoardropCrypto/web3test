@@ -500,3 +500,491 @@ body.dark-theme .icon-button i {
         background-color: #00c6a2;
         color: white;
     }
+    
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.nav-links a {
+    color: #fff;
+    font-weight: bold;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover {
+    color: #00ffa2;
+}
+
+/* General Feature Section Styling */
+.feature-section {
+    background-color: #25262C;
+    border-radius: 10px;
+    padding: 20px;
+    width: 90%;
+    max-width: 500px; /* Lebarkan sedikit untuk fitur baru */
+    margin: 20px auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.feature-section h2 {
+    color: #fff;
+    margin: 0;
+}
+
+.feature-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* Liquidity Section */
+.user-liquidity-positions {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #333;
+}
+
+#liquidityPositionsList {
+    list-style-type: none;
+    padding: 0;
+}
+
+#liquidityPositionsList li {
+    background-color: #333;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+/* Staking Section */
+.staking-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.staking-info {
+    margin-top: 30px;
+    padding: 15px;
+    background-color: #010b1f67;
+    border-radius: 8px;
+}
+
+.staking-info p {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+}
+
+/* Analytics Page */
+.analytics-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+@media (min-width: 768px) {
+    .analytics-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+#poolsTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#poolsTable th, #poolsTable td {
+    padding: 12px;
+    border-bottom: 1px solid #444;
+    text-align: left;
+}
+
+#poolsTable th {
+    color: #00ffa2;
+}
+
+/* New Listings Section */
+#newListingSection {
+    max-width: 400px; /* Match the swap section width */
+    background-color: #25262C;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#newListingSection h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#newListingsList {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+#newListingsList li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #333;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    transition: background-color 0.3s;
+}
+
+#newListingsList li:hover {
+    background-color: #444;
+}
+
+#newListingsList img {
+    width: 35px;
+    height: 35px;
+    margin-right: 15px;
+}
+
+.listing-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.token-name {
+    font-weight: bold;
+    font-size: 16px;
+    color: #fff;
+}
+
+.token-ticker {
+    font-size: 14px;
+    color: #A0A0A0;
+}
+
+.trade-button {
+    padding: 8px 15px;
+    font-size: 14px;
+    width: auto; /* Override full width from .button */
+    background-color: #00c6a2;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.trade-button:hover {
+    background-color: #00ffa2;
+}
+
+/* Chart Section Styles */
+.chart-container {
+    width: 100%;
+    height: 300px;
+    margin: 20px 0;
+    background-color: #010b1f3d;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.chart-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.chart-controls .button {
+    padding: 8px 15px;
+    font-size: 14px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.chart-controls .button.active {
+    background-color: #00c6a2;
+    color: #fff;
+}
+
+.chart-controls .button:hover {
+    background-color: #444;
+}
+
+/* Top Gainers & Losers Section */
+#topGainersSection, #topLosersSection {
+    max-width: 400px;
+    background-color: #25262C;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#topGainersCountSelect, #topLosersCountSelect {
+    padding: 5px 8px;
+    border: 1px solid #333;
+    border-radius: 5px;
+    background-color: #333;
+    color: #fff;
+    font-size: 14px;
+}
+
+#topGainersList, #topLosersList {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+#topGainersList li, #topLosersList li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #333;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    transition: background-color 0.3s;
+}
+
+#topGainersList li:hover, #topLosersList li:hover {
+    background-color: #444;
+}
+
+#topGainersList img, #topLosersList img {
+    width: 35px;
+    height: 35px;
+    margin-right: 15px;
+}
+
+.gainer-price-change {
+    font-size: 14px;
+    color: #00ffa2;
+}
+
+.loser-price-change {
+    font-size: 14px;
+    color: #ff4d4d; /* Warna merah untuk Top Losers */
+}
+
+.list-item-details {
+    text-align: right;
+}
+
+.list-item-details .gainer-price-change,
+.list-item-details .loser-price-change {
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Custom Modal Styling */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #25262C;
+    padding: 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 420px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+
+.modal-header {
+    border-bottom: 1px solid #444;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 20px;
+    color: #fff;
+    text-align: center;
+}
+
+.modal-body .modal-line-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.modal-body .modal-line-item span:first-child {
+    color: #A0A0A0;
+}
+
+.modal-body .modal-line-item strong {
+    color: #fff;
+}
+
+.modal-body hr {
+    border: 1px solid #444;
+    margin: 15px 0;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.modal-footer .button {
+    flex: 1;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.button-secondary {
+    background-color: #444;
+    color: #fff;
+}
+
+.button-secondary:hover {
+    background-color: #555;
+}
+
+.highlight-flash {
+    transition: box-shadow 0.2s ease-in-out;
+    box-shadow: 0 0 5px #00ffa2, 0 0 10px #00ffa2;
+}
+
+#futuresSection input,
+#futuresSection select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  background-color: #010b1f67;
+  border: 1px solid #00c6a2;
+  border-radius: 5px;
+  color: white;
+}
+
+#futuresSection .staking-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+}
+
+#futuresSection .staking-buttons button {
+  flex: 1;
+  margin: 0 5px;
+  background-color: #00c6a2;
+  color: black;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  transition: 0.3s;
+}
+
+#futuresSection .staking-buttons button:hover {
+  background-color: #00ffa2;
+}
+
+#futuresResult {
+  margin-top: 15px;
+  background-color: #010b1f3d;
+  padding: 12px;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+/* Styling untuk daftar posisi futures */
+#openPositionsSection h3 {
+    color: #00ffa2;
+}
+
+#positionsList {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 10px;
+}
+
+.position-item {
+    background-color: #333;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.position-details {
+    font-size: 14px;
+}
+
+.position-details p {
+    margin: 4px 0;
+}
+
+.position-details .tp-sl-info {
+    font-size: 12px;
+    color: #A0A0A0;
+    margin-top: 5px;
+}
+
+.tp-sl-info span {
+    font-weight: bold;
+    margin-left: 5px;
+    margin-right: 15px;
+}
+
+.pnl-positive {
+    color: #00ffa2; /* Hijau untuk profit */
+}
+
+.pnl-negative {
+    color: #ff4d4d; /* Merah untuk loss */
+}
+
+.close-button {
+    background-color: #ff4d4d;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.close-button:hover {
+    background-color: #e60000;
+}
+
+.position-details .liq-price-info {
+    font-size: 12px;
+    color: #A0A0A0;
+}
+
+.liq-price-value {
+    color: #ff4d4d;
+    font-weight: bold;
+}
+
+.close-button:hover {
+    background-color: #e60000;
+}
