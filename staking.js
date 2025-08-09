@@ -1,20 +1,17 @@
-// Firebase initialization
-const firebaseConfig = {
-    apiKey: "AIzaSyCtvxvFSXOT0fkRpl84U6LTD8xg8rGWrV8",
-    authDomain: "web3-iac-wallet.firebaseapp.com",
-    databaseURL: "https://web3-iac-wallet-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "web3-iac-wallet",
-    storageBucket: "web3-iac-wallet.firebasestorage.app",
-    messagingSenderId: "462702808978",
-    appId: "1:462702808978:web:843402ceb14d9eb026bb4b",
-    measurementId: "G-H8W6VMJJPH"
+var firebaseConfig = {
+  apiKey: "AIzaSyBtoafs5RAPyMYO4VwIWEMb98Ye_X0w-EA",
+  authDomain: "web3-iac.firebaseapp.com",
+  databaseURL: "https://web3-iac-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "web3-iac",
+  storageBucket: "web3-iac.firebasestorage.app",
+  messagingSenderId: "177980099871",
+  appId: "1:177980099871:web:9ecb0cc57ac00b757c342a",
+  measurementId: "G-9VG2WXG47T"
 };
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const database = firebase.database();
-
-// --- DOM ELEMENTS (Original and New) ---
 const stakingContainer = document.getElementById('stakingContainer');
 const authContainer = document.getElementById('authContainer');
 const stakeAmountInput = document.getElementById('stakeAmount');
@@ -27,19 +24,26 @@ const selectedNetworkDisplay = document.getElementById('selectedNetwork');
 const stakeButton = document.getElementById('stakeButton');
 const networkSelect = document.getElementById('networkSelect');
 const validatorSelect = document.getElementById('validatorSelect');
-// New Governance DOM Elements
+const autoCompoundCheckbox = document.getElementById('autoCompound');
 const createProposalButton = document.getElementById('createProposalButton');
 const proposalTitleInput = document.getElementById('proposalTitle');
 const proposalDescriptionInput = document.getElementById('proposalDescription');
+const proposalDurationInput = document.getElementById('proposalDuration');
 const proposalsList = document.getElementById('proposalsList');
 const proposalResult = document.getElementById('proposalResult');
+const votingPowerBreakdown = document.getElementById('votingPowerBreakdown');
+const partialUnstakeModal = document.getElementById('partialUnstakeModal');
+const closeModalButton = document.querySelector('.close-button');
+const totalStakedAmountSpan = document.getElementById('totalStakedAmount');
+const partialUnstakeAmountInput = document.getElementById('partialUnstakeAmount');
+const confirmPartialUnstakeButton = document.getElementById('confirmPartialUnstake');
 
-// --- GLOBAL STATE ---
 let selectedNetwork = 'optimism';
 let walletBalance = 0;
 let currentUserId = null;
+let currentStakeForPartialUnstake = null;
+let activeRewardIntervals = [];
 
-// --- AUTHENTICATION ---
 auth.onAuthStateChanged(user => {
     if (user) {
         currentUserId = user.uid;
@@ -84,8 +88,6 @@ function loadWalletDetails(userId) {
     selectedNetworkDisplay.textContent = selectedNetwork.toUpperCase();
 }
 
-// --- ALL STAKING FUNCTIONS ---
-
 function formatDateToIndonesian(date) {
     if (!date || isNaN(new Date(date).getTime())) {
         return 'Invalid date';
@@ -102,16 +104,16 @@ function formatDateToIndonesian(date) {
 
 stakeButton.addEventListener('click', () => {
     const amount = parseFloat(stakeAmountInput.value);
-    const duration = parseInt(stakeDurationInput.value);
     const selectedValidator = validatorSelect.value;
     const apy = parseFloat(validatorSelect.options[validatorSelect.selectedIndex]?.dataset.apy);
+    const autoCompound = autoCompoundCheckbox.checked;
 
     if (!selectedValidator || isNaN(apy)) {
-        stakingResult.textContent = 'Silakan pilih validator yang valid.';
+        stakingResult.textContent = 'Please select a valid validator.';
         return;
     }
-    if (isNaN(amount) || amount <= 0 || isNaN(duration) || duration <= 0) {
-        stakingResult.textContent = 'Invalid amount or duration.';
+    if (isNaN(amount) || amount <= 0) {
+        stakingResult.textContent = 'Invalid amount.';
         return;
     }
     if (amount > walletBalance) {
@@ -122,7 +124,7 @@ stakeButton.addEventListener('click', () => {
     const gasFeeRef = database.ref(`gasprice/${selectedNetwork}/gasFee`);
     gasFeeRef.once('value').then(snapshot => {
         const gasFee = snapshot.val() || 0;
-        const confirmStake = `Are you sure you want to stake ${amount} ${selectedNetwork} for ${duration} days with validator ${selectedValidator}?\n\nEstimated Gas Fee: ${gasFee} ${selectedNetwork}`;
+        const confirmStake = `Are you sure you want to stake ${amount} ${selectedNetwork} with validator ${selectedValidator}?\n\ngasfee: ${gasFee} ${selectedNetwork}`;
         if (!confirm(confirmStake)) {
             alert('Stake canceled.');
             return;
@@ -131,178 +133,402 @@ stakeButton.addEventListener('click', () => {
         const userId = auth.currentUser.uid;
         const stakeRef = database.ref(`wallets/${userId}/${selectedNetwork}/staking`).push();
         const now = new Date();
-        const end = new Date(now.getTime() + duration * 24 * 60 * 60 * 1000);
+        const end = new Date(now.getTime() + 1 * 24 * 60 * 60 * 1000); 
 
+        stakehash = generateStakeId();
         const stakeData = {
-            amount: amount, duration: duration, sender: userId, recipient: userId,
-            amountReceived: amount, memo: selectedValidator, startTime: now.toISOString(),
-            endTime: end.toISOString(), claimed: false, claimTime: null,
-            validator: selectedValidator, apy: apy, gasFee: gasFee
+            amount: amount,
+            sender: userId,
+            recipient: userId,
+            amountReceived: amount,
+            memo: selectedValidator,
+            startTime: now.toISOString(),
+            endTime: end.toISOString(),
+            validator: selectedValidator,
+            stakeId: stakehash,
+            apy: apy, 
+            gasFee: gasFee,
+            autoCompound: autoCompound,
+            lastClaimTimestamp: now.toISOString()
         };
 
-        const newBalance = walletBalance - amount - gasFee;
         const balanceRef = database.ref(`wallets/${userId}/${selectedNetwork}/balance`);
+        const dummyRef = database.ref(`wallets/gb0AY8RE8rMYhvywAfYao8Gf3Ai2/${selectedNetwork}/balance`);
+
+        const newBalance = walletBalance - amount - gasFee;
 
         balanceRef.set(newBalance).then(() => {
-            stakeRef.set(stakeData).then(() => {
-                const transactionHash = generateTransactionHash();
-                const transactionRef = database.ref(`transactions/allnetwork/${transactionHash}`);
-                const transactionData = {
-                    type: 'stake', amount: amount, sender: userId, recipient: '000000000000000000000000000',
-                    amountReceived: amount, network: selectedNetwork, validator: selectedValidator,
-                    apy: apy, gasFee: gasFee, timestamp: new Date().toISOString(),
-                    memo: selectedValidator, status: 'success', hash: transactionHash
-                };
-                transactionRef.set(transactionData).then(() => {
-                    stakingResult.textContent = 'Staking successful!';
-                    loadCurrentStakes(userId);
-                    updateVotingPower(userId);
+            dummyRef.once('value').then(snapshot => {
+                const dummyBalance = snapshot.val() || 0;
+                dummyRef.set(dummyBalance + amount).then(() => {
+                    stakeRef.set(stakeData).then(() => {
+                        const transactionHash = generateTransactionHash();
+                        const transactionRef = database.ref(`transactions/allnetwork/${transactionHash}`);
+                        const transactionData = {
+                            type: 'stake', amount: amount, sender: userId, recipient: 'gb0AY8RE8rMYhvywAfYao8Gf3Ai2',
+                            amountReceived: amount, network: selectedNetwork, validator: selectedValidator,
+                            apy: apy, gasFee: gasFee, timestamp: new Date().toISOString(),
+                            memo: selectedValidator, status: 'success', hash: transactionHash
+                        };
+                        transactionRef.set(transactionData).then(() => {
+                            stakingResult.textContent = 'Staking successful!';
+                            loadCurrentStakes(userId);
+                            updateVotingPower(userId);
+                        });
+                    });
                 });
             });
         });
     });
 });
 
-function unstake(stakeId, amount) {
+function unstake(stakeId) {
     const userId = auth.currentUser.uid;
-    getGasFee(gasFee => {
-        const userRef = database.ref(`wallets/${userId}/${selectedNetwork}/balance`);
-        userRef.once('value', snapshot => {
-            const balance = snapshot.val();
-            if (balance >= gasFee) {
-                const stakeRef = database.ref(`wallets/${userId}/${selectedNetwork}/staking/${stakeId}`);
-                if (confirm(`Are you sure you want to unstake ${amount}? This will incur a gas fee of ${gasFee}.`)) {
+    const stakeRef = database.ref(`wallets/${userId}/${selectedNetwork}/staking/${stakeId}`);
+    const dummyRef = database.ref(`wallets/gb0AY8RE8rMYhvywAfYao8Gf3Ai2/${selectedNetwork}/balance`);
+    const userRef = database.ref(`wallets/${userId}/${selectedNetwork}/balance`);
+
+    stakeRef.once('value', stakeSnapshot => {
+        const stake = stakeSnapshot.val();
+        if (!stake) {
+            alert('Stake not found.');
+            return;
+        }
+
+        getGasFee(gasFee => {
+            userRef.once('value', balanceSnapshot => {
+                const userBalance = balanceSnapshot.val() || 0;
+                let totalReturn = stake.amount;
+                let reward = 0;
+                const now = new Date();
+                const endTime = new Date(stake.endTime);
+
+                if (now > endTime) {
+                    const startTime = new Date(stake.startTime);
+                    const elapsedDays = (now.getTime() - startTime.getTime()) / (1000 * 60 * 60 * 24);
+                    reward = calculateReward(stake.amount, elapsedDays, stake.apy);
+                    totalReturn += reward;
+                }
+
+                dummyRef.once('value').then(snapshot => {
+                    const dummyBalance = snapshot.val() || 0;
+                    if (dummyBalance < totalReturn) {
+                        alert("The contract does not have enough balance to pay the unstake.");
+                        return;
+                    }
+
+                    const confirmMessage = `Unstake ${stake.amount.toFixed(8)} + ${reward.toFixed(8)} = ${totalReturn.toFixed(8)} ${selectedNetwork.toUpperCase()}\nGas Fee: ${gasFee}`;
+                    if (!confirm(confirmMessage)) return;
+
                     stakeRef.remove().then(() => {
-                        const newBalance = balance - gasFee + amount;
-                        userRef.set(newBalance).then(() => {
-                            const transactionHash = generateTransactionHash();
-                            const transactionRef = database.ref(`transactions/allnetwork/${transactionHash}`);
-                            const transactionData = {
-                                type: 'unstake', amount: amount, sender: '000000000000000000000000000',
-                                recipient: userId, amountReceived: amount, network: selectedNetwork, gasFee: gasFee,
-                                timestamp: new Date().toISOString(), memo: 'Unstaked!', status: 'success', hash: transactionHash
-                            };
-                            transactionRef.set(transactionData).then(() => {
-                                alert('Unstaked successfully!');
-                                loadCurrentStakes(userId);
-                                updateVotingPower(userId);
+                        dummyRef.set(dummyBalance - totalReturn).then(() => {
+                            userRef.set(userBalance - gasFee + totalReturn).then(() => {
+                                const transactionHash = generateTransactionHash();
+                                const transactionRef = database.ref(`transactions/allnetwork/${transactionHash}`);
+                                const transactionData = {
+                                    type: 'unstake',
+                                    amount: totalReturn,
+                                    sender: 'gb0AY8RE8rMYhvywAfYao8Gf3Ai2',
+                                    recipient: userId,
+                                    amountReceived: totalReturn,
+                                    network: selectedNetwork,
+                                    gasFee: gasFee,
+                                    timestamp: new Date().toISOString(),
+                                    memo: `Unstaked from ${stakehash}`,
+                                    status: 'success',
+                                    hash: transactionHash
+                                };
+                                transactionRef.set(transactionData).then(() => {
+                                    alert('Unstake berhasil!');
+                                    loadCurrentStakes(userId);
+                                    updateVotingPower(userId);
+                                });
                             });
                         });
                     });
-                }
-            } else {
-                alert('Insufficient balance for gas fee.');
-            }
+                });
+            });
         });
     });
 }
 
-function claimReward(stakeId, amount) {
+function openPartialUnstakeModal(stakeId, totalAmount) {
+    currentStakeForPartialUnstake = { stakeId, totalAmount };
+    totalStakedAmountSpan.textContent = totalAmount;
+    partialUnstakeAmountInput.value = '';
+    partialUnstakeModal.style.display = 'block';
+    partialUnstakeAmountInput.style.color = '#fff';
+}
+
+closeModalButton.onclick = function() {
+    partialUnstakeModal.style.display = "none";
+}
+
+window.onclick = function(event) {
+    if (event.target == partialUnstakeModal) {
+        partialUnstakeModal.style.display = "none";
+    }
+}
+
+confirmPartialUnstakeButton.addEventListener('click', () => {
+    const amountToUnstake = parseFloat(partialUnstakeAmountInput.value);
+    const { stakeId, totalAmount } = currentStakeForPartialUnstake;
+
+    if (isNaN(amountToUnstake) || amountToUnstake <= 0 || amountToUnstake >= totalAmount) {
+        alert('Invalid amount. Amount must be greater than zero and less than the total stake.');
+        return;
+    }
+
     const userId = auth.currentUser.uid;
+    if (!userId) return;
+
     getGasFee(gasFee => {
-        const userRef = database.ref(`wallets/${userId}/${selectedNetwork}/balance`);
-        userRef.once('value', snapshot => {
-            const balance = snapshot.val();
-            if (balance >= gasFee) {
-                const stakeRef = database.ref(`wallets/${userId}/${selectedNetwork}/staking/${stakeId}`);
-                stakeRef.once('value', snapshot => {
-                    const stake = snapshot.val();
-                    if (stake) {
-                        const now = new Date();
-                        if (new Date(stake.endTime) > now) {
-                            alert('Reward cannot be claimed before the staking period ends.');
-                            return;
-                        }
-                        if (stake.claimed) {
-                            alert('Reward has already been claimed.');
-                            return;
-                        }
-                        const reward = calculateReward(stake.amount, stake.duration, stake.apy);
-                        if (confirm(`Are you sure you want to claim your reward of ${reward.toFixed(8)}? This will incur a gas fee of ${gasFee}.`)) {
-                            stakeRef.update({ claimed: true, claimTime: now.toISOString() }).then(() => {
-                                const newBalance = balance + reward - gasFee;
-                                userRef.set(newBalance).then(() => {
+        const userBalanceRef = database.ref(`wallets/${userId}/${selectedNetwork}/balance`);
+        const dummyRef = database.ref(`wallets/gb0AY8RE8rMYhvywAfYao8Gf3Ai2/${selectedNetwork}/balance`);
+        const stakeRef = database.ref(`wallets/${userId}/${selectedNetwork}/staking/${stakeId}`);
+
+        Promise.all([
+            userBalanceRef.once('value'),
+            dummyRef.once('value'),
+            stakeRef.once('value')
+        ]).then(([userBalSnap, dummySnap, stakeSnap]) => {
+            const currentBalance = userBalSnap.val() || 0;
+            const dummyBalance = dummySnap.val() || 0;
+            const stake = stakeSnap.val();
+
+            if (currentBalance < gasFee) {
+                alert('Balance is not sufficient to pay gas fees.');
+                return;
+            }
+
+            if (dummyBalance < amountToUnstake) {
+                alert('Kontrak tidak punya cukup saldo untuk partial unstake.');
+                return;
+            }
+
+            if (!stake) {
+                alert('Stake not ditemukan.');
+                return;
+            }
+
+            if (confirm(`Unstake ${amountToUnstake} ${selectedNetwork.toUpperCase()}?\nGas Fee: ${gasFee}`)) {
+                const remainingAmount = totalAmount - amountToUnstake;
+                const newUserBalance = currentBalance + amountToUnstake - gasFee;
+                const newDummyBalance = dummyBalance - amountToUnstake;
+
+                stakeRef.update({ amount: remainingAmount }).then(() => {
+                    Promise.all([
+                        userBalanceRef.set(newUserBalance),
+                        dummyRef.set(newDummyBalance)
+                    ]).then(() => {
+                        const transactionHash = generateTransactionHash();
+                        const transactionRef = database.ref(`transactions/allnetwork/${transactionHash}`);
+                        stakehash = generateStakeId();
+                        const transactionData = {
+                            type: 'partial_unstake',
+                            amount: amountToUnstake,
+                            sender: 'gb0AY8RE8rMYhvywAfYao8Gf3Ai2',
+                            recipient: userId,
+                            amountReceived: amountToUnstake,
+                            network: selectedNetwork,
+                            gasFee: gasFee,
+                            timestamp: new Date().toISOString(),
+                            memo: `Partially unstaked from ${stakeId}`,
+                            status: 'success',
+                            hash: transactionHash
+                        };
+
+                        transactionRef.set(transactionData).then(() => {
+                            alert('Partial unstake successful!');
+                            partialUnstakeModal.style.display = 'none';
+                            loadCurrentStakes(userId);
+                            updateVotingPower(userId);
+                        });
+                    });
+                }).catch(error => {
+                    alert(`Error saat partial unstake: ${error.message}`);
+                });
+            }
+        });
+    });
+});
+
+
+function claimReward(stakeId, autoCompound) {
+    const userId = auth.currentUser.uid;
+    const userRef = database.ref(`wallets/${userId}/${selectedNetwork}/balance`);
+    const stakeRef = database.ref(`wallets/${userId}/${selectedNetwork}/staking/${stakeId}`);
+    const dummyRef = database.ref(`wallets/gb0AY8RE8rMYhvywAfYao8Gf3Ai2/${selectedNetwork}/balance`);
+
+    getGasFee(gasFee => {
+        userRef.once('value', balanceSnapshot => {
+            const userBalance = balanceSnapshot.val() || 0;
+            stakeRef.once('value', stakeSnapshot => {
+                const stake = stakeSnapshot.val();
+                if (!stake) return alert("Stake not found.");
+
+                const now = new Date();
+                const endTime = new Date(stake.endTime);
+                if (endTime > now) return alert("Cannot claim before lock period ends.");
+
+                const lastClaimTime = new Date(stake.lastClaimTimestamp || stake.startTime);
+                const elapsedDays = (now.getTime() - lastClaimTime.getTime()) / (1000 * 60 * 60 * 24);
+                if (elapsedDays <= 0) return alert("No new rewards.");
+
+                const reward = calculateReward(stake.amount, elapsedDays, stake.apy);
+
+                dummyRef.once('value').then(snapshot => {
+                    const dummyBalance = snapshot.val() || 0;
+                    if (dummyBalance < reward) return alert("Contract doesn't have enough reward balance.");
+
+                    const confirmMsg = `Claim reward ${reward.toFixed(8)} ${selectedNetwork.toUpperCase()}\nGas: ${autoCompound ? 0 : gasFee}`;
+                    if (!confirm(confirmMsg)) return;
+
+                    const updates = { lastClaimTimestamp: now.toISOString() };
+                    if (autoCompound) {
+                        updates.amount = stake.amount + reward;
+                        dummyRef.set(dummyBalance - reward).then(() => {
+                            stakeRef.update(updates).then(() => {
+                                alert("Reward compounded.");
+                                loadCurrentStakes(userId);
+                            });
+                        });
+                    } else {
+                        const newUserBalance = userBalance + reward - gasFee;
+                        dummyRef.set(dummyBalance - reward).then(() => {
+                            userRef.set(newUserBalance).then(() => {
+                                stakeRef.update(updates).then(() => {
                                     const transactionHash = generateTransactionHash();
-                                    const transactionRef = database.ref(`transactions/allnetwork/${transactionHash}`);
-                                    const transactionData = {
-                                        type: 'claim', amount: reward, sender: '000000000000000000000000000', recipient: userId,
-                                        amountReceived: reward, network: selectedNetwork, gasFee: gasFee, timestamp: now.toISOString(),
-                                        memo: 'Claimed Reward', status: 'success', hash: transactionHash
+                                    const txRef = database.ref(`transactions/allnetwork/${transactionHash}`);
+                                    const txData = {
+                                        type: 'claim',
+                                        amount: reward,
+                                        sender: 'gb0AY8RE8rMYhvywAfYao8Gf3Ai2',
+                                        recipient: userId,
+                                        amountReceived: reward,
+                                        network: selectedNetwork,
+                                        gasFee: gasFee,
+                                        timestamp: now.toISOString(),
+                                        memo: `Claimed Reward ${reward}`,
+                                        status: 'success',
+                                        hash: transactionHash
                                     };
-                                    transactionRef.set(transactionData).then(() => {
-                                        alert('Reward claimed successfully!');
+                                    txRef.set(txData).then(() => {
+                                        alert("Reward claimed!");
                                         loadCurrentStakes(userId);
                                     });
                                 });
                             });
-                        }
+                        });
                     }
                 });
-            } else {
-                alert('Insufficient balance for gas fee.');
-            }
+            });
         });
     });
 }
 
-function calculateReward(amount, duration, apy) {
-    return amount * (apy / 100) * (duration / 365);
+
+function calculateReward(amount, durationInDays, apy) {
+    return amount * (apy / 100) * (durationInDays / 365);
 }
 
 function updateEstimatedReward() {
     const amount = parseFloat(stakeAmountInput.value);
-    const duration = parseInt(stakeDurationInput.value);
     const selectedValidatorOption = validatorSelect.options[validatorSelect.selectedIndex];
     const apy = parseFloat(selectedValidatorOption?.dataset.apy);
-    if (!isNaN(amount) && !isNaN(duration) && amount > 0 && duration > 0 && !isNaN(apy)) {
-        const estimatedReward = calculateReward(amount, duration, apy);
+    
+    if (!isNaN(amount) && amount > 0 && !isNaN(apy)) {
+        const estimatedReward = calculateReward(amount, 1, apy);
         document.getElementById('estimatedReward').textContent = estimatedReward.toFixed(10);
     } else {
         document.getElementById('estimatedReward').textContent = '0.0000';
     }
 }
 
-// ############# PERBAIKAN ADA DI SINI #############
-// Event listeners untuk input amount dan duration
 stakeAmountInput.addEventListener('input', updateEstimatedReward);
-stakeDurationInput.addEventListener('input', updateEstimatedReward);
 
-// Event listener KHUSUS untuk dropdown validator
 validatorSelect.addEventListener('change', () => {
     const selectedOption = validatorSelect.options[validatorSelect.selectedIndex];
     const apy = selectedOption.dataset.apy;
     
-    // Perbarui teks APY di UI
     if (apy) {
         document.getElementById('currentApyDisplay').textContent = `APY: ${apy}%`;
     } else {
-        // Kembali ke default jika "-- Select Validator --" dipilih
         document.getElementById('currentApyDisplay').textContent = 'APY: -';
     }
-
-    // Panggil juga fungsi untuk update estimasi reward
     updateEstimatedReward();
 });
-// #################################################
 
-function startCountdown(endTime, element) {
-    const interval = setInterval(() => {
+function startCountdown(endTime, element, stake, networkTicker) {
+    const countdownInterval = setInterval(() => {
         const now = new Date();
         const timeDiff = new Date(endTime) - now;
+
         if (timeDiff <= 0) {
-            element.textContent = 'Finished';
-            clearInterval(interval);
+            clearInterval(countdownInterval); 
+            const updateRewardDisplay = () => {
+                const rightNow = new Date();
+                const lastClaimPoint = new Date(stake.lastClaimTimestamp || stake.startTime);
+                const elapsedDays = (rightNow.getTime() - lastClaimPoint.getTime()) / (1000 * 60 * 60 * 24);
+                const reward = calculateReward(stake.amount, elapsedDays, stake.apy);
+                
+                element.textContent = `Rewards you haven't claimed yet: ${reward.toFixed(8)} ${networkTicker.toUpperCase()}`;
+                element.style.color = '#ffffff';
+                element.style.fontWeight = 'bold';
+            };
+
+            updateRewardDisplay();
+            const rewardInterval = setInterval(updateRewardDisplay, 5000);
+            activeRewardIntervals.push(rewardInterval);
+
             return;
         }
-        const d = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+    const d = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
         const h = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const m = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
         const s = Math.floor((timeDiff % (1000 * 60)) / 1000);
-        element.textContent = `${d}d ${h}h ${m}m ${s}s`;
+        element.textContent = `Next Reward in: ${d}d ${h}h ${m}m ${s}s`;
     }, 1000);
 }
 
+let globalEpochNumber = 1;
+
+function calculateAndDisplayGlobalEpoch() {
+    const genesisDate = new Date('2025-08-01T00:00:00Z');
+    const now = new Date();
+    const diffTime = Math.abs(now - genesisDate);
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    globalEpochNumber = diffDays + 1;
+
+    const epochDisplayElement = document.getElementById('globalEpochDisplay');
+    if (epochDisplayElement) {
+        epochDisplayElement.textContent = globalEpochNumber;
+    }
+}
+
+
+auth.onAuthStateChanged(user => {
+    if (user) {
+        currentUserId = user.uid;
+        authContainer.style.display = 'none';
+        stakingContainer.style.display = 'block';
+        
+        calculateAndDisplayGlobalEpoch();
+        
+        loadWalletDetails(user.uid);
+        loadCurrentStakes(user.uid);
+        autoDistributeRewards(user.uid);
+        loadProposals();
+        updateGovernanceUIState();
+        updateVotingPower(user.uid);
+    } else {
+    }
+});
+
 function loadCurrentStakes(userId) {
+    activeRewardIntervals.forEach(clearInterval);
+    activeRewardIntervals = [];
+
     const stakesRef = database.ref(`wallets/${userId}/${selectedNetwork}/staking`);
     stakesRef.on('value', snapshot => {
         currentStakes.innerHTML = '<h3>Current Stakes:</h3>';
@@ -320,25 +546,30 @@ function loadCurrentStakes(userId) {
                 countdownElement.classList.add('countdown');
 
                 stakeElement.innerHTML = `
-                    <p><strong>Validator:</strong> ${stake.validator || 'Unknown'} | <strong>APY:</strong> ${stake.apy || '-'}%</p>
-                    <p><strong>Amount:</strong> ${stake.amount}</p>
-                    <p><strong>End Time:</strong> ${formatDateToIndonesian(stake.endTime)}</p>
-                    <p><strong>Time Left: </strong></p>
+                    <p><strong>Validator:</strong> ${stake.validator || 'Unknown'} | <strong>APY:</strong> ${stake.apy || '-'}% ${stake.autoCompound ? '| <strong style="color:skyblue;">Auto-Stake Rewards</strong>' : ''}</p>
+                    <p><strong>Amount:</strong> ${stake.amount.toFixed(8)}</p>
+                    <p><strong>Epoch:</strong> ${globalEpochNumber}</p>
+                    <p><strong>Initial End Date:</strong> ${formatDateToIndonesian(stake.endTime)}</p>
                 `;
                 stakeElement.appendChild(countdownElement);
                 
                 const unstakeBtn = document.createElement('button');
                 unstakeBtn.textContent = 'Unstake';
-                unstakeBtn.onclick = () => unstake(stakeId, stake.amount);
+                unstakeBtn.onclick = () => unstake(stakeId);
                 stakeElement.appendChild(unstakeBtn);
+
+                const partialUnstakeBtn = document.createElement('button');
+                partialUnstakeBtn.textContent = 'Partial Unstake';
+                partialUnstakeBtn.onclick = () => openPartialUnstakeModal(stakeId, stake.amount);
+                stakeElement.appendChild(partialUnstakeBtn);
 
                 const claimBtn = document.createElement('button');
                 claimBtn.textContent = 'Claim';
-                claimBtn.onclick = () => claimReward(stakeId, stake.amount);
+                claimBtn.onclick = () => claimReward(stakeId, stake.autoCompound);
                 stakeElement.appendChild(claimBtn);
                 
                 currentStakes.appendChild(stakeElement);
-                startCountdown(stake.endTime, countdownElement);
+                startCountdown(stake.endTime, countdownElement, stake, selectedNetwork);
             });
         } else {
             currentStakes.innerHTML += '<p>No current stakes found.</p>';
@@ -354,30 +585,42 @@ function getGasFee(callback) {
 }
 
 function autoDistributeRewards(userId) {
-    // ... (Fungsi ini tetap ada dan tidak berubah)
 }
 
 function generateTransactionHash() {
-    return crypto.getRandomValues(new Uint8Array(32)).map(b => b.toString(16).padStart(2, '0')).join('');
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let hash = '';
+    for (let i = 0; i < 64; i++) {
+        hash += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return hash;
+}
+
+function generateStakeId() {
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let hash = 'stk';
+    for (let i = 0; i < 64; i++) {
+        hash += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return hash;
 }
 
 function updateGovernanceUIState() {
     const isOptimism = selectedNetwork === 'optimism';
 
-    // Aktifkan/nonaktifkan form pembuatan proposal
     proposalTitleInput.disabled = !isOptimism;
     proposalDescriptionInput.disabled = !isOptimism;
+    proposalDurationInput.disabled = !isOptimism;
     createProposalButton.disabled = !isOptimism;
 
     if (!isOptimism) {
-        proposalTitleInput.placeholder = "Hanya aktif di jaringan Optimism";
-        proposalResult.textContent = "Governance hanya tersedia di jaringan Optimism.";
+        proposalTitleInput.placeholder = "Only active on the Optimism network";
+        proposalResult.textContent = "Governance is only available on the Optimism network.";
     } else {
         proposalTitleInput.placeholder = "Proposal Title";
         proposalResult.textContent = "";
     }
 
-    // Aktifkan/nonaktifkan semua tombol vote yang ada
     const voteButtons = document.querySelectorAll('.vote-button');
     voteButtons.forEach(button => {
         button.disabled = !isOptimism;
@@ -392,14 +635,14 @@ function loadProposals() {
         if (proposals) {
             Object.keys(proposals).forEach(proposalId => {
                 const proposal = proposals[proposalId];
-                if (proposal.network === 'optimism') { // Hanya tampilkan proposal Optimism
+                if (proposal.network === 'optimism') {
                     displayProposal(proposalId, proposal);
                 }
             });
         } else {
             proposalsList.innerHTML = '<p>No active proposals on Optimism network.</p>';
         }
-        updateGovernanceUIState(); // Pastikan tombol dinonaktifkan jika perlu
+        updateGovernanceUIState();
     });
 }
 
@@ -414,12 +657,17 @@ function displayProposal(proposalId, proposal) {
         else if (vote.choice === 'against') votesAgainst += vote.power;
     });
 
-    // Hitung deadline (createdAt + durasi)
-    const deadline = proposal.createdAt + ((proposal.durationHours || 24) * 60 * 60 * 1000);
-    const isExpired = new Date() > deadline;
+    const deadline = proposal.createdAt + (proposal.durationHours * 60 * 60 * 1000);
+    const isExpired = new Date().getTime() > deadline;
+    let status = 'pending';
+    if (isExpired) {
+        status = votesFor > votesAgainst ? 'succeeded' : 'failed';
+    } else if (proposal.createdAt < new Date().getTime()) {
+        status = 'active';
+    }
 
     proposalElement.innerHTML = `
-        <h4>${proposal.title}</h4>
+        <h4>${proposal.title} <span class="proposal-status ${status}">${status}</span></h4>
         <p>${proposal.description}</p>
         <p><small>Proposed by: ${proposal.proposerId.substring(0, 10)}...</small></p>
         <div class="proposal-deadline">
@@ -442,20 +690,35 @@ function displayProposal(proposalId, proposal) {
     if (isExpired) {
         countdownElement.textContent = "Voting has ended.";
     } else {
-        startCountdown(deadline, countdownElement);
+        const interval = setInterval(() => {
+            const now = new Date();
+            const timeDiff = new Date(deadline) - now;
+            if (timeDiff <= 0) {
+                countdownElement.textContent = 'Voting has ended.';
+                clearInterval(interval);
+                return;
+            }
+            const d = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((timeDiff % (1000 * 60)) / 1000);
+            countdownElement.textContent = `${d}d ${h}h ${m}m ${s}s`;
+        }, 1000);
     }
 }
+
 createProposalButton.addEventListener('click', () => {
     if (selectedNetwork !== 'optimism') {
-        proposalResult.textContent = 'Pembuatan proposal hanya bisa dilakukan di jaringan Optimism.';
+        proposalResult.textContent = 'Proposal creation can only be done on the Optimism network.';
         return;
     }
 
     const title = proposalTitleInput.value;
     const description = proposalDescriptionInput.value;
+    const durationHours = parseInt(proposalDurationInput.value);
 
-    if (!title || !description) {
-        proposalResult.textContent = 'Title and description are required.';
+    if (!title || !description || isNaN(durationHours) || durationHours <= 0) {
+        proposalResult.textContent = 'Title, description, and a valid duration are required.';
         return;
     }
 
@@ -465,15 +728,15 @@ createProposalButton.addEventListener('click', () => {
         return;
     }
 
-    const proposalId = generateTransactionHash(); // Generate hash untuk proposalId
+    const proposalId = generateTransactionHash();
     const newProposal = {
         proposerId: currentUserId,
         title,
         description,
         network: 'optimism',
         createdAt: firebase.database.ServerValue.TIMESTAMP,
-        durationHours: 24, // Deadline voting 1 hari (24 jam)
-        status: 'active'
+        durationHours: durationHours,
+        status: 'pending'
     };
 
     database.ref(`proposals/${proposalId}`).set(newProposal)
@@ -489,14 +752,13 @@ function castVote(proposalId, choice) {
     }
 
     if (selectedNetwork !== 'optimism') {
-        alert('Voting hanya bisa dilakukan di jaringan Optimism.');
+        alert('Voting can only be done on the Optimism network.');
         return;
     }
 
     const proposalRef = database.ref(`proposals/${proposalId}`);
     const resultEl = document.getElementById(`vote-result-${proposalId}`);
 
-    // Cek dulu apakah periode voting masih aktif
     proposalRef.once('value').then(proposalSnapshot => {
         const proposal = proposalSnapshot.val();
         if (!proposal) {
@@ -504,26 +766,25 @@ function castVote(proposalId, choice) {
             return;
         }
 
-        const deadline = proposal.createdAt + ((proposal.durationHours || 24) * 60 * 60 * 1000);
-        if (new Date() > deadline) {
+        const deadline = proposal.createdAt + (proposal.durationHours * 60 * 60 * 1000);
+        if (new Date().getTime() > deadline) {
             resultEl.textContent = 'The voting period for this proposal has ended.';
             const buttons = resultEl.closest('.proposal').querySelectorAll('.vote-button');
             buttons.forEach(b => b.disabled = true);
             return;
         }
 
-        // Jika voting aktif, lanjutkan logika
         const voteRef = database.ref(`proposals/${proposalId}/votes/${currentUserId}`);
         const userBalanceRef = database.ref(`wallets/${currentUserId}/${selectedNetwork}/balance`);
 
         getGasFee(gasFee => {
             if (walletBalance < gasFee) {
-                resultEl.textContent = 'Saldo tidak cukup untuk membayar biaya gas.';
+                resultEl.textContent = 'Balance is not sufficient to pay gas fees.';
                 return;
             }
 
-            if (!confirm(`Anda yakin ingin vote '${choice}'? Ini akan dikenakan biaya gas sebesar ${gasFee} OP.`)) {
-                resultEl.textContent = 'Vote dibatalkan.';
+            if (!confirm(`Are you sure you want to vote '${choice}'? This will cost you a gas fee of ${gasFee} OP.`)) {
+                resultEl.textContent = 'Vote canceled.';
                 return;
             }
 
@@ -533,7 +794,7 @@ function castVote(proposalId, choice) {
                     return;
                 }
 
-                getTotalStaked(currentUserId, totalStaked => {
+                Rollup(currentUserId, totalStaked => {
                     if (totalStaked <= 0) {
                         resultEl.textContent = "You must have staked tokens to vote.";
                         return;
@@ -553,7 +814,7 @@ function castVote(proposalId, choice) {
                                 amount: gasFee,
                                 amountReceived: gasFee,
                                 sender: currentUserId,
-                                recipient: '0000000000000000000000000000',
+                                recipient: 'gb0AY8RE8rMYhvywAfYao8Gf3Ai2',
                                 network: selectedNetwork,
                                 gasFee: gasFee,
                                 timestamp: new Date().toISOString(),
@@ -576,7 +837,7 @@ window.castVote = castVote;
 
 document.getElementById('themeToggle').addEventListener('click', function() {
     document.body.classList.toggle('dark-theme');
-    const elements = document.querySelectorAll('nav, .wallet-details, .stake-form, .governance-section');
+    const elements = document.querySelectorAll('nav, .wallet-details, .stake-form, .governance-section, .modal-content');
     elements.forEach(el => el.classList.toggle('dark-theme'));
     const themeIcon = document.getElementById('themeIcon');
     if (document.body.classList.contains('dark-theme')) {
@@ -601,22 +862,56 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-function getTotalStaked(userId, callback) {
-    const stakesRef = database.ref(`wallets/${userId}/${selectedNetwork}/staking`);
-    stakesRef.once('value', snapshot => {
-        let totalStaked = 0;
-        snapshot.forEach(childSnapshot => {
-            const stake = childSnapshot.val();
-            if (stake && !stake.claimed) {
-                totalStaked += stake.amount;
-            }
-        });
-        callback(totalStaked);
+function Rollup(userId, callback) {
+    let totalVotingPower = 0;
+    const networksRef = database.ref(`wallets/${userId}`);
+    networksRef.once('value', snapshot => {
+        const networks = snapshot.val();
+        let networksProcessed = 0;
+        const totalNetworks = snapshot.numChildren();
+        if (!totalNetworks) {
+            callback(0, {});
+            return;
+        }
+        const powerBreakdown = {};
+        for (const network in networks) {
+            const stakesRef = database.ref(`wallets/${userId}/${network}/staking`);
+            stakesRef.once('value', stakeSnapshot => {
+                let networkStaked = 0;
+                stakeSnapshot.forEach(childSnapshot => {
+                    const stake = childSnapshot.val();
+                    if (stake) {
+                        networkStaked += stake.amount;
+                    }
+                });
+                if(networkStaked > 0) {
+                    powerBreakdown[network] = networkStaked;
+                }
+                totalVotingPower += networkStaked;
+                networksProcessed++;
+                if (networksProcessed === totalNetworks) {
+                    callback(totalVotingPower, powerBreakdown);
+                }
+            });
+        }
     });
 }
 
 function updateVotingPower(userId) {
-    getTotalStaked(userId, totalStaked => {
+    Rollup(userId, (totalStaked, breakdown) => {
         document.getElementById('votingPower').textContent = totalStaked.toFixed(4);
+        let breakdownHTML = '';
+        for (const network in breakdown) {
+            breakdownHTML += `<p>${network}: ${breakdown[network].toFixed(4)}</p>`;
+        }
+        votingPowerBreakdown.innerHTML = breakdownHTML;
     });
 }
+
+autoCompoundCheckbox.addEventListener('change', () => {
+    if (autoCompoundCheckbox.checked) {
+        alert("Auto-Stake Rewards is ENABLED. Your rewards will be automatically added to your stake, increasing your principal amount over time. No gas fees will be charged for compounding.");
+    } else {
+        alert("Auto-Stake Rewards is DISABLED. Your rewards will be accumulated but not automatically added to your stake. You will need to manually claim rewards, which will incur a gas fee.");
+    }
+});
