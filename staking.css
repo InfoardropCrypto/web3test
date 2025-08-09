@@ -1,37 +1,38 @@
-/* Global styles */
 body {
-    font-family: Arial, sans-serif;
-    background-color: white;
-    color: black;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9em;
+    background-color: #000;
+    color: #fff;
     margin: 0;
     padding: 0;
     text-align: center;
 }
 
 a {
-    color: #179ccdff;
-    text-decoration: none;
+    color: #fff;
+    text-decoration: underline;
     font-weight: bold;
 }
 
 a:hover {
-    color: #179ccdff;
+    color: #ccc;
 }
 
-/* Navbar */
 nav.logo-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 5px 15px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    word-wrap: break-word; /* Ensure text wraps to next line */
+    border-bottom: 2px solid #fff;
+    word-wrap: break-word;
     word-break: break-all;
+    box-shadow: none;
+    border-radius: 0;
 }
 
 nav.logo-container img {
     height: 40px;
-    border-radius: 20px;
+    border-radius: 0;
 }
 
 nav.logo-container a {
@@ -42,12 +43,18 @@ nav.logo-container a {
 
 nav .button {
     color: #fff;
+    background-color: #000;
     padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
+    border: 1px solid #fff;
+    border-radius: 0;
     font-size: 14px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+nav .button:hover {
+    background-color: #fff;
+    color: #000;
 }
 
 nav p {
@@ -59,97 +66,71 @@ select {
     width: auto;
     padding: 10px;
     margin: 5px 0 20px 0;
-    border: 1px solid #333;
-    border-radius: 5px;
-    color: black;
+    border: 1px solid #fff;
+    border-radius: 0;
+    color: #fff;
+    background-color: #000;
 }
 
-body.dark-theme {
-    background-color: #121212;
-    color: #f5f6fa;
-}
-
-.wallet-details {
+.wallet-details,
+.stake-form,
+.governance-section,
+.liquidity-form {
     padding: 20px;
-    background-color: #ffffff;
-    color: #333;
-    border-radius: 15px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background-color: #000;
+    color: #fff;
+    border-radius: 0;
+    box-shadow: none;
+    border: 2px solid #fff;
     margin: 20px;
     text-align: left;
     word-wrap: break-word;
     word-break: break-all;
 }
 
-.wallet-details.dark-theme {
-    background-color: #1f1f1f;
-    color: #f5f6fa;
-}
-
-.stake-form, .governance-section {
-    margin: 20px;
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 15px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    text-align: left;
-}
-
-.stake-form.dark-theme, .governance-section.dark-theme {
-    background-color: #1f1f1f;
-}
-
 .stake-form label, .governance-section label {
     display: block;
     margin-bottom: 8px;
     font-weight: bold;
-    color: #555;
+    color: #fff;
 }
 
-body.dark-theme .stake-form label, body.dark-theme .governance-section label {
-    color: #ccc;
-}
-
-
-.stake-form input, .create-vote-section input, .create-vote-section textarea {
+.stake-form input,
+.create-vote-section input,
+.create-vote-section textarea {
     width: calc(100% - 24px);
     padding: 12px;
     margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    border: 1px solid #fff;
+    border-radius: 0;
     font-size: 16px;
-}
-
-body.dark-theme .stake-form input, 
-body.dark-theme .create-vote-section input, 
-body.dark-theme .create-vote-section textarea {
-    background-color: #333;
-    border-color: #555;
-    color: #f5f6fa;
+    background-color: #000;
+    color: #fff;
 }
 
 .stake-button, #createProposalButton, .vote-button {
-    background-color: #179ccdff;
+    background-color: #000;
     color: white;
     padding: 12px 20px;
-    border: none;
-    border-radius: 8px;
+    border: 1px solid #fff;
+    border-radius: 0;
     font-size: 16px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
     width: 100%;
 }
 
 .stake-button:hover, #createProposalButton:hover, .vote-button:hover {
-    background-color: #147aab;
+    background-color: #fff;
+    color: #000;
 }
 
-/* Added style for disabled buttons */
 .vote-button:disabled {
-    background-color: #999;
+    background-color: #333;
+    color: #888;
+    border-color: #888;
     cursor: not-allowed;
 }
-
 
 #currentStakes {
     margin: 20px;
@@ -159,7 +140,7 @@ body.dark-theme .create-vote-section textarea {
 .staking-result, #proposalResult {
     margin-top: 10px;
     font-weight: bold;
-    color: #179ccdff;
+    color: #fff;
 }
 
 .icon-button {
@@ -170,15 +151,10 @@ body.dark-theme .create-vote-section textarea {
 }
 .icon-button i {
     font-size: 24px;
-    color: #3c8ce7;
+    color: #fff;
     transition: color 0.3s;
 }
 
-body.dark-theme .icon-button i {
-    color: #ffcc00;
-}
-
-/* Governance & Voting Section */
 .governance-section h2 {
     text-align: center;
     margin-bottom: 25px;
@@ -187,14 +163,9 @@ body.dark-theme .icon-button i {
 .create-vote-section, .vote-section {
     margin-top: 20px;
     padding: 20px;
-    background-color: #f9f9f9;
-    border: 1px solid #eee;
-    border-radius: 10px;
-}
-
-body.dark-theme .create-vote-section, body.dark-theme .vote-section {
-    background-color: #2a2a2a;
-    border-color: #444;
+    background-color: #000;
+    border: 1px dashed #fff;
+    border-radius: 0;
 }
 
 .create-vote-section h3, .vote-section h3 {
@@ -202,14 +173,10 @@ body.dark-theme .create-vote-section, body.dark-theme .vote-section {
 }
 
 #proposalsList .proposal {
-    border: 1px solid #ddd;
+    border: 1px solid #fff;
     padding: 15px;
     margin-bottom: 15px;
-    border-radius: 8px;
-}
-
-body.dark-theme #proposalsList .proposal {
-    border-color: #555;
+    border-radius: 0;
 }
 
 .proposal h4 {
@@ -222,17 +189,12 @@ body.dark-theme #proposalsList .proposal {
     gap: 10px;
 }
 
-/* Added style for deadline display */
 .proposal-deadline {
     font-size: 0.9em;
     font-weight: bold;
-    color: #555;
+    color: #ccc;
     margin-top: 10px;
     margin-bottom: 10px;
-}
-
-body.dark-theme .proposal-deadline {
-    color: #ccc;
 }
 
 .vote-button {
@@ -240,21 +202,245 @@ body.dark-theme .proposal-deadline {
     flex-grow: 1;
 }
 
-.vote-button.for {
-    background-color: #28a745;
+.vote-button.for,
+.vote-button.against {
+    background-color: #000;
+    border: 1px solid #fff;
 }
-.vote-button.for:hover {
-    background-color: #218838;
+.vote-button.for:hover,
+.vote-button.against:hover {
+    background-color: #fff;
+    color: #000;
 }
 
-.vote-button.against {
-    background-color: #dc3545;
-}
-.vote-button.against:hover {
-    background-color: #c82333;
-}
 
 .proposal-results {
     margin-top: 10px;
     font-size: 0.9em;
+}
+
+.modal {
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.7);
+}
+
+.modal-content {
+    background-color: #000;
+    color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border: 2px solid #fff;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 0;
+}
+
+.close-button {
+    color: #fff;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #ccc;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#votingPowerBreakdown {
+    font-size: 0.9em;
+    color: #ccc;
+    margin-top: 5px;
+}
+
+.proposal-status {
+    font-weight: bold;
+    padding: 3px 8px;
+    border: 1px solid #fff;
+    color: white;
+    font-size: 0.8em;
+    background-color: #000;
+}
+
+.token-selection {
+    margin-bottom: 20px;
+}
+
+.token-selection label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.wallet-balance {
+    font-size: 0.9em;
+    color: #ccc;
+    margin-bottom: 10px;
+}
+
+.liquidity-pool-token {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-size: 1.1em;
+    text-align: center;
+}
+
+#currentLiquidity {
+    margin: 20px;
+    text-align: left;
+}
+
+.liquidity-position {
+    border: 1px solid #fff;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 0;
+    background-color: #000;
+}
+
+.lp-actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.lp-actions button {
+    padding: 8px 12px;
+    border: 1px solid #fff;
+    border-radius: 0;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    flex-grow: 1;
+    background-color: #000;
+}
+.lp-actions button:hover {
+    background-color: #fff;
+    color: #000;
+}
+
+.remove-button, .claim-button {
+    background-color: #000;
+}
+.remove-button:hover, .claim-button:hover {
+    background-color: #fff;
+    color: #000;
+}
+
+.token-selection-wrapper {
+    background-color: #000;
+    border: 1px solid #fff;
+    border-radius: 0;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.token-input-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9em;
+    color: #ccc;
+    margin-bottom: 8px;
+}
+
+.token-input-container {
+    display: flex;
+    align-items: center;
+}
+
+.token-input-container input[type="number"] {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-size: 1.5em;
+    padding: 0;
+    -moz-appearance: textfield;
+}
+
+.token-input-container input[type="number"]::-webkit-outer-spin-button,
+.token-input-container input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.custom-select-trigger {
+    display: flex;
+    align-items: center;
+    background-color: #000;
+    border: 1px solid #fff;
+    border-radius: 0;
+    padding: 6px 12px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.custom-select-trigger:hover {
+    background-color: #333;
+}
+
+.custom-select-trigger img {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+}
+
+.custom-select-trigger span {
+    font-weight: bold;
+    margin-right: 8px;
+}
+
+.custom-select-options {
+    display: none;
+    position: absolute;
+    background-color: #000;
+    border: 1px solid #fff;
+    border-radius: 0;
+    width: 200px;
+    z-index: 100;
+    box-shadow: none;
+}
+
+.custom-select-option {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+.custom-select-option:hover {
+    background-color: #333;
+}
+
+.custom-select-option img {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+}
+
+.custom-select-option.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #111;
+}
+
+#themeToggle {
+    display: none;
+}
+
+.proposal-status.pending { background-color: #ffc107; }
+.proposal-status.active { background-color: #17a2b8; }
+.proposal-status.succeeded { background-color: #28a745; }
+.proposal-status.failed { background-color: #dc3545; }
+
+input {
+  color: white;
 }
