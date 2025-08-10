@@ -15,14 +15,7 @@
 
     <div id="stakingContainer" style="display: none;">
         <nav class="logo-container">
-            <h1>IAC | STAKE & VOTE</h1>
-            <select id="networkSelect">
-                <option value="steth" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/8085.png">Lido Staked Ether</option>
-                <option value="eth" data-image="https://raw.githubusercontent.com/InfoardropCrypto/iac/refs/heads/main/cryptologo/ethereum.png">Ethereum</option>
-                <option value="optimism" data-image="https://raw.githubusercontent.com/InfoardropCrypto/iac/refs/heads/main/cryptologo/optimism.png">Optimism</option>
-                <option value="sol" data-image="https://raw.githubusercontent.com/InfoardropCrypto/iac/refs/heads/main/cryptologo/solana.jpg">Solana</option>
-                <option value="sui" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/20947.png">Sui</option>
-            </select>
+            <h1>ICfinance</h1>
             <button id="connectWalletButton" class="button" onclick="confirm('Connected')">Connected</button>
             <button id="themeToggle" class="icon-button">
                 <i class="fas fa-sun" id="themeIcon"></i>
@@ -30,6 +23,14 @@
         </nav>
 
         <div class="wallet-details">
+          <select id="networkSelect">
+                <option value="optimism" data-image="https://raw.githubusercontent.com/InfoardropCrypto/iac/refs/heads/main/cryptologo/optimism.png">Optimism</option>
+                <option value="steth" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/8085.png">Lido Staked Ether</option>
+                <option value="eth" data-image="https://raw.githubusercontent.com/InfoardropCrypto/iac/refs/heads/main/cryptologo/ethereum.png">Ethereum</option>
+                <option value="sol" data-image="https://raw.githubusercontent.com/InfoardropCrypto/iac/refs/heads/main/cryptologo/solana.jpg">Solana</option>
+                <option value="sui" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/20947.png">Sui</option>
+                <option value="walrus" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/36119.png">Walrus</option>
+            </select>
             <p style="display:none;">Wallet Address: <span id="walletAddress">Loading...</span></p>
             <div>
               <img id="networkIcon" src="iac.png" alt=" Icon " style="text-align:;border-radius:100%;width:20px;">
@@ -38,11 +39,9 @@
         </div>
 
         <div class="stake-form">
-            <h2>STAKE TOKENS</h2>
+            <h2>STAKE YOUR TOKENS</h2>
             <input type="number" id="stakeAmount" step="0.0001" placeholder="Stake amount">
-            <input type="number" id="stakeDuration" placeholder="Enter duration in days">
             
-            <label for="validatorSelect">Pilih Validator:</label>
             <select id="validatorSelect">
               <option value="">-- Select Validator --</option>
               <option value="mining.js" data-apy="200">Mining.js</option>
@@ -54,7 +53,15 @@
             </select>
 
             <div id="currentApyDisplay">APY: -</div>
-            <p><strong>Estimasi Reward : </strong><a id="estimatedReward">0</a></p>
+            <p><strong>Estimasi Reward (per Days) : </strong><a id="estimatedReward">0</a></p>
+            
+            <p><strong>Epoch:</strong> <span id="globalEpochDisplay">Loading...</span></p>
+
+            <hr>
+            <div class="auto-compound-container">
+              <label for="autoCompound">Auto Stake Rewards</label>
+                <input type="checkbox" id="autoCompound">
+            </div>
             
             <button id="stakeButton" class="stake-button">Stake</button>
             <p id="stakingResult" class="staking-result"></p>
@@ -69,15 +76,18 @@
         <div class="governance-section">
             <h2>GOVERNANCE</h2>
             
-            <div class="create-vote-section" style="display:none;">
+            <div class="create-vote-section">
                 <h3>Create a New Proposal</h3>
                 <input type="text" id="proposalTitle" placeholder="Proposal Title">
                 <textarea id="proposalDescription" rows="4" placeholder="Describe your proposal..."></textarea>
+                <input type="number" id="proposalDuration" placeholder="Duration in hours">
                 <button id="createProposalButton">Create Proposal</button>
-                <p id="proposalResult"></p>
+                
             </div>
             
             <p><strong>Your Voting Power:</strong> <span id="votingPower">0</span></p>
+            <div id="votingPowerBreakdown"></div>
+            <p id="proposalResult"></p>
 
             <div class="vote-section">
                 <h3>Active Proposals</h3>
@@ -85,6 +95,16 @@
                     <p>Loading proposals...</p>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div id="partialUnstakeModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Partial Unstake</h2>
+            <p>Total Staked: <span id="totalStakedAmount"></span></p>
+            <input type="number" id="partialUnstakeAmount" placeholder="Amount to unstake">
+            <button id="confirmPartialUnstake">Confirm Unstake</button>
         </div>
     </div>
 
