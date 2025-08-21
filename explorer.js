@@ -206,6 +206,9 @@ function createTransactionElement(transactionId, transaction, isNew) {
 
     const senderLink = sender !== 'anonym' ? `<span class="wallet-link" onclick="showWalletDetails('${sender}')">${sender}</span>` : 'anonym';
     const recipientLink = recipient !== 'anonym' ? `<span class="wallet-link" onclick="showWalletDetails('${recipient}')">${recipient}</span>` : 'anonym';
+    
+    const contractAddress = contractAddresses[transaction.network] || '000000000000000000000000020';
+    const contractAddressLink = contractAddress !== 'N/A' ? `<span class="wallet-link" onclick="showWalletDetails('${contractAddress}')">${contractAddress}</span>` : 'N/A';
 
     const transactionElement = document.createElement('div');
     transactionElement.className = 'transaction';
@@ -225,6 +228,7 @@ function createTransactionElement(transactionId, transaction, isNew) {
         <p><strong>Send:</strong> <font style="color:white;background-color:#cc4d4d;border-radius:100px;">⤴</font>${transaction.amount}</p>
         <p><strong>Received:</strong> <font style="color:white;background-color:#4dcc4d;border-radius:100px;">⤵</font>${transaction.amountReceived}</p>
         <p><strong>Source:</strong> ${transaction.network}</p>
+        <p><strong>Contract Token Address:</strong> ${contractAddressLink}</p>
         <p style="color:#7f7e7ecf;">################################</p>
         <p><strong>Memo:</strong> ${memo}</p>
         <p><strong>Gas fee:</strong> ${transaction.gasFee}</p>
