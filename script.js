@@ -35,6 +35,8 @@ const tokenBalanceElement = document.getElementById('tokenBalance');
 const confirmationModal = document.getElementById('confirmationModal');
 const confirmSendButton = document.getElementById('confirmSend');
 const cancelSendButton = document.getElementById('cancelSend');
+const transactionHistoryList = document.getElementById('transactionHistoryList');
+let lastKnownBalances = {};
 
 document.getElementById('searchInput').addEventListener('input', function() {
     var filter = this.value.toLowerCase();
@@ -74,32 +76,53 @@ firebase.auth().onAuthStateChanged(user => {
     } else {
         authContainer.style.display = 'block';
         walletContainer.style.display = 'none';
+        lastKnownBalances = {};
     }
 });
-
-function EtherERCBalance() {
-    const userId = firebase.auth().currentUser.uid;
-    const selectedNetwork = networkSelect.value;
-    const balanceRef = firebase.database().ref(`wallets/${userId}/${selectedNetwork}/balance`);
-
-    balanceRef.on('value', snapshot => {
-        const balance = snapshot.val() || 0;
-        tokenBalanceElement.textContent = `Token Balance: ${balance}`;
-    });
-}
 
 const tickerMap = {
     eth: 'ETH', usdt_erc20: 'USDT', usdc_erc20: 'USDC', weth: 'WETH', lido: 'LIDO',
     steth: 'StETH', optimism_eth: 'ETH', optimism: 'OP', base_eth: 'ETH', sol: 'SOL',
-    jup: 'JUP', cosmos: 'ATOM', sui: 'SUI', pepe: 'PEPE', supra: 'SUPRA',
+    jup: 'JUP', cosmos: 'ATOM', sui: 'SUI', walrus: 'WAL', ika: 'IKA', haedal: 'HAEDAL',
+    hasui: 'HASUI', deep: 'DEEP', cetus: 'CETUS', ns: 'NS',sca: 'SCA', blue: 'BLUE', usdc_sui: 'USDC',
+    usdt_sui: 'USDT', navx: 'NAVX', pepe: 'PEPE', supra: 'SUPRA', xrp: 'XRP', bnb: 'BNB',
+    usdt_bep20: 'USDT', succinct: 'PROVE', pengu: 'PENGU', near: 'NEAR',
 };
 
 const gasFeeRanges = {
-    eth: [0.0000751836, 0.003711735], lido: [0.01, 0.01], weth: [0.00035, 0.00034],
-    steth: [0.0035, 0.00034], usdc_erc20: [0.01, 0.01], usdt_erc20: [0.01, 0.01],
-    optimism_eth: [0.0000005, 0.0000002], optimism: [0.0005, 0.0001],
-    base_eth: [0.00000055, 0.00000025], sol: [0.002, 0.0025], jup: [0.00516, 0.00680],
-    cosmos: [0.005, 0.003], sui: [0.00705, 0.00025000], pepe: [0.02, 0.03], supra: [0.002, 0.006]
+    eth: [0.0000751836, 0.0003711735],
+    lido: [0.01, 0.01],
+    weth: [0.000035, 0.00034],
+    steth: [0.00035, 0.000034],
+    usdc_erc20: [0.5108375, 0.319875],
+    usdt_erc20: [0.5108375, 0.319875],
+    optimism_eth: [0.00000005, 0.0000002], 
+    optimism: [0.0005, 0.0001],
+    base_eth: [0.00000055, 0.00000025], 
+    sol: [0.002, 0.0025], 
+    jup: [0.00516, 0.00680],
+    cosmos: [0.005, 0.003], 
+    sui: [0.0105, 0.00025000], 
+    walrus: [0.03, 0.041],
+    ika: [0.0345, 0.0234],
+    pepe: [0.02, 0.03], 
+    supra: [0.002, 0.006],
+    haedal: [0.006, 0.003],
+    hasui: [0.00705, 0.00025000],
+    deep: [0.03, 0.02],
+    cetus: [0.04, 0.055], 
+    ns: [0.021, 0.045],
+    sca: [0.015, 0.035], 
+    blue: [0.011, 0.033],
+    navx: [0.012, 0.065], 
+    usdc_sui: [0.023, 0.043],
+    usdt_sui: [0.024, 0.045],
+    xrp: [0.003123, 0.001321],
+    bnb: [0.000054, 0.000036],
+    usdt_bep20: [0.41234, 0.14321],
+    succinct: [0.007111111,0.0081111111],
+    pengu: [0.0040000,0.00555555],
+    near: [0.0001, 0.0511],
 };
 
 function getRandomGasFee(network) {
@@ -153,6 +176,7 @@ signOutButton.addEventListener('click', () => {
     }).catch(error => console.error('Sign out error:', error));
 });
 
+
 function updateWallet() {
     const userId = firebase.auth().currentUser.uid;
     const selectedNetwork = networkSelect.value;
@@ -167,20 +191,78 @@ function updateWallet() {
             addressRef.set(address);
         }
         cryptoAddressElement.textContent = address;
+        loadTransactionHistory();
     });
 
     balanceRef.on('value', snapshot => {
-        let balance = snapshot.val() || 0;
-        balance = parseFloat(balance).toLocaleString('en-US', { minimumFractionDigits: 10, maximumFractionDigits: 10, useGrouping: true });
+        const newBalance = parseFloat(snapshot.val() || 0);
         const ticker = tickerMap[selectedNetwork];
-        cryptoBalanceElement.textContent = `Balance: ${balance} ${ticker}`;
-        tokenBalanceElement.textContent = `Token Balance: ${balance}`;
+        if (lastKnownBalances[selectedNetwork] !== undefined && newBalance > lastKnownBalances[selectedNetwork]) {
+            const amountReceived = newBalance - lastKnownBalances[selectedNetwork];
+            const formattedAmount = amountReceived.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 8 });
+            showNotification(`Menerima: +${formattedAmount} ${ticker}`, 10000);
+        }
+        lastKnownBalances[selectedNetwork] = newBalance;
+        let formattedBalance = newBalance.toLocaleString('en-US', { minimumFractionDigits: 10, maximumFractionDigits: 10, useGrouping: true });
+        cryptoBalanceElement.textContent = `Balance: ${formattedBalance} ${ticker}`;
     });
 
     gasFeeRef.on('value', snapshot => {
         const gasFee = snapshot.val() || getRandomGasFee(selectedNetwork);
         gasFeeRef.set(gasFee);
         gasFeeElement.textContent = `${gasFee} ${tickerMap[selectedNetwork]}`;
+    });
+}
+
+function loadTransactionHistory() {
+    const userId = auth.currentUser.uid;
+    const userAddress = cryptoAddressElement.textContent;
+    const transactionsRef = database.ref('transactions/allnetwork');
+
+    transactionsRef.orderByChild('timestamp').on('value', snapshot => {
+        transactionHistoryList.innerHTML = '';
+        let userTransactions = [];
+
+        if (!snapshot.exists()) {
+            transactionHistoryList.innerHTML = `<p class="info-text">No transaction history found.</p>`;
+            return;
+        }
+
+        snapshot.forEach(childSnapshot => {
+            const tx = childSnapshot.val();
+            if (tx.sender === userId || tx.recipient === userAddress) {
+                userTransactions.push(tx);
+            }
+        });
+
+        userTransactions.reverse();
+
+        if (userTransactions.length === 0) {
+            transactionHistoryList.innerHTML = `<p class="info-text">No transaction history found.</p>`;
+            return;
+        }
+
+        userTransactions.forEach(tx => {
+            const isSent = tx.sender === userId;
+            const type = isSent ? 'Sent' : 'Received';
+            const amountClass = isSent ? 'sent' : 'received';
+            const amountSign = isSent ? '-' : '+';
+            const ticker = tickerMap[tx.network] || '...';
+            const date = new Date(tx.timestamp).toLocaleString();
+
+            const txItemHTML = `
+                <div class="transaction-item">
+                    <div class="transaction-details">
+                        <span class="transaction-type">${type} ${ticker}</span>
+                        <span class="transaction-date">${date}</span>
+                    </div>
+                    <div class="transaction-amount ${amountClass}">
+                        ${amountSign}${tx.amount.toLocaleString()}
+                    </div>
+                </div>
+            `;
+            transactionHistoryList.innerHTML += txItemHTML;
+        });
     });
 }
 
@@ -220,12 +302,12 @@ sendCryptoButton.addEventListener('click', () => {
     const userAddress = cryptoAddressElement.textContent.trim();
 
     if (recipientAddress === userAddress) {
-        showNotification("You cannot send crypto to yourself.", 2000);
+        showNotification("Anda tidak bisa mengirim kripto ke alamat sendiri.", 2000);
         return;
     }
 
     if (isNaN(amount) || amount <= 0) {
-        showNotification("Invalid amount.", 2000);
+        showNotification("Jumlah tidak valid.", 2000);
         return;
     }
     
@@ -233,7 +315,7 @@ sendCryptoButton.addEventListener('click', () => {
 });
 cancelSendButton.addEventListener('click', () => {
     confirmationModal.style.display = 'none';
-    showNotification("Transaction cancelled.", 2000);
+    showNotification("Transaksi dibatalkan.", 2000);
 });
 
 confirmSendButton.addEventListener('click', () => {
@@ -253,44 +335,52 @@ function executeTransaction() {
     const selectedRpcUrl = document.getElementById("selectrpc").value;
     let delay = 0;
     if (selectedRpcUrl === "https://rpc-iaconchain.io") {
-        delay = 8500;
+        delay = 1000;
     } else if (selectedRpcUrl === "https://rpc-ac-mainnet.com") {
-        delay = 7900;
+        delay = 1000;
     } else if (selectedRpcUrl === " https://rpc.ankr.com") {
-        delay = 8700;
+        delay = 1000;
     }
 
-    userBalanceRef.once('value').then(snapshot => {
-        const currentBalance = snapshot.val() || 0;
+userBalanceRef.once('value').then(snapshot => {
+const currentBalance = snapshot.val() || 0;
+if (currentBalance >= totalCost) {
+userBalanceRef.set(currentBalance - totalCost).then(() => {
+  const recipientRef = firebase.database().ref(`wallets/${recipientAddress}/${selectedNetwork}/balance`);
+  recipientRef.once('value').then(snapshot => {
+    const recipientBalance = snapshot.val() || 0;
+    recipientRef.set(recipientBalance + amount).then(() => {
+      const transactionHash = generateTransactionHash();
+const transactionRef = firebase.database().ref(`transactions/allnetwork/${transactionHash}`);
+const transactionData = {
+  network: selectedNetwork,
+  sender: userId,
+  recipient: recipientAddress,
+  amount: amount,
+  amountReceived: amount, 
+  gasFee: gasFee, 
+  memo: memo,
+  timestamp: new Date().toISOString()
+};
+transactionRef.set(transactionData).then(() => {
+  setTimeout(() => {
+    const explorerUrl = generateExplorerUrl(selectedNetwork, transactionHash);
+    const ticker = tickerMap[selectedNetwork] || selectedNetwork;
+    const formattedAmount = amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 8 });
+        
+        showNotification(`Berhasil mengirim ${formattedAmount} ${ticker}! Lihat: ${explorerUrl}`, 10000);
 
-        if (currentBalance >= totalCost) {
-            userBalanceRef.set(currentBalance - totalCost).then(() => {
-                const recipientRef = firebase.database().ref(`wallets/${recipientAddress}/${selectedNetwork}/balance`);
-                recipientRef.once('value').then(snapshot => {
-                    const recipientBalance = snapshot.val() || 0;
-                    recipientRef.set(recipientBalance + amount).then(() => {
-                        const transactionHash = generateTransactionHash();
-                        const transactionRef = firebase.database().ref(`transactions/allnetwork/${transactionHash}`);
-                        const transactionData = {
-                            network: selectedNetwork, sender: userId, recipient: recipientAddress,
-                            amount: amount, amountReceived: amount, gasFee: gasFee, memo: memo,
-                            timestamp: new Date().toISOString()
-                        };
-                        transactionRef.set(transactionData).then(() => {
-                            setTimeout(() => {
-                                const explorerUrl = generateExplorerUrl(selectedNetwork, transactionHash);
-                                showNotification(`Crypto sent successfully! View: ${explorerUrl}`, 4000);
-                            }, delay);
-                        });
-                    });
-                });
-            });
+  }, delay);
+   });
+    });
+  });
+});
         } else {
-            showNotification("Insufficient balance to cover the transaction and gas fee.", 2000);
+            showNotification("Saldo tidak cukup untuk membayar transaksi dan biaya gas.", 5000);
         }
     }).catch(error => {
         console.error('Error fetching balance:', error);
-        showNotification("Error processing transaction.", 2000);
+        showNotification("Gagal memproses transaksi.", 2000);
     });
 }
 
@@ -309,7 +399,7 @@ function generateExplorerUrl(network, transactionHash) {
         case 'z': baseUrl = 'https://iac-explorer.com/tx/'; break;
         case 'eth': baseUrl = 'https://etherscan.io/tx/'; break;
         case 'sui': baseUrl = 'https://suiscan.xyz/mainnet/tx/'; break;
-        default: baseUrl = 'https://iac-explorer.com/tx/';
+        default: baseUrl = 'https://infoardropcrypto.github.io/web3test/explorer.html#';
     }
     return `${baseUrl}${transactionHash}`;
 }
@@ -325,7 +415,7 @@ function startGasFeeSync() {
         const selectedNetwork = networkSelect.value;
         const gasFeeRef = firebase.database().ref(`gasprice/${selectedNetwork}/gasFee`);
         gasFeeRef.set(getRandomGasFee(selectedNetwork));
-    }, 10000);
+    }, 60000);
 }
 
 function stopGasFeeSync() {
@@ -378,12 +468,15 @@ document.addEventListener("DOMContentLoaded", function () {
 function showNotification(message, duration = 10000) {
     const notification = document.getElementById('notification');
     if (!notification) {
-        console.error("Notification element not found!");
+        console.error("Elemen notifikasi tidak ditemukan!");
         return;
     }
+    console.log("Menampilkan notifikasi:", message);
     notification.textContent = message;
     notification.classList.add('show');
-    setTimeout(() => {
+
+    clearTimeout(notification.hideTimeout);
+    notification.hideTimeout = setTimeout(() => {
         notification.classList.remove('show');
     }, duration);
 }
