@@ -295,8 +295,6 @@ details {
 #confirmationModal .modal-content {
     background-color: #1e293b;
     color: #f0f0f0;
-    margin: 99% auto;
-    padding: 25px;
     border: 1px solid #3b82f6;
     border-radius: 12px;
     width: 340px;
@@ -342,4 +340,332 @@ details {
     background-color: black;
     border: outset 2px black;
     box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+}
+
+:root {
+    --bg-color: #1a202c;
+    --surface-color: #2d3748;
+    --primary-color: #4299e1;
+    --primary-hover-color: #2b6cb0;
+    --text-primary: #edf2f7;
+    --text-secondary: #a0aec0;
+    --border-color: #4a5568;
+    --danger-color: #f56565;
+    --danger-hover-color: #c53030;
+    --confirm-color: #48bb78;
+    --confirm-hover-color: #2f855a;
+    --font-family: 'Poppins', sans-serif;
+}
+
+body {
+    font-family: var(--font-family);
+    margin: 0;
+    padding: 20px;
+    background: var(--bg-color);
+    color: var(--text-primary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+#authContainer, #walletContainer {
+    width: 100%;
+    max-width: 500px;
+    padding: 30px;
+    border-radius: 16px;
+    background: var(--surface-color);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-color);
+}
+
+h2 {
+    text-align: center;
+    color: var(--text-primary);
+    margin-top: 0;
+    margin-bottom: 24px;
+    font-weight: 600;
+}
+
+input[type="email"], input[type="password"], input[type="number"], input[type="text"], select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: #1a202c;
+    color: var(--text-primary);
+    font-family: var(--font-family);
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+}
+
+.password-container {
+    position: relative;
+    width: 100%;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 1px;
+    top: 1px;
+    bottom: 17px;
+    border: none;
+    background: transparent;
+    padding: 0 15px;
+    cursor: pointer;
+    font-size: 20px;
+    color: var(--text-secondary);
+}
+
+.form-switcher {
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.form-switcher a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+button {
+    font-family: var(--font-family);
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 12px 20px;
+    border: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    transform: translateY(-2px);
+}
+
+.button-primary {
+    width: 100%;
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 16px;
+}
+
+.button-primary:hover {
+    background-color: var(--primary-hover-color);
+}
+
+.button-secondary {
+    background-color: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    width: 100%;
+}
+
+.button-secondary:hover {
+    background-color: var(--border-color);
+}
+
+.button-danger {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.button-danger:hover {
+    background-color: var(--danger-hover-color);
+}
+
+.button-confirm {
+    background-color: var(--confirm-color);
+    color: white;
+}
+
+.button-confirm:hover {
+    background-color: var(--confirm-hover-color);
+}
+
+.wallet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.rpc-selector {
+    text-align: right;
+}
+.rpc-selector p {
+    font-size: 12px;
+    margin: 4px 0 0;
+    color: var(--text-secondary);
+}
+.rpc-selector select {
+    margin-bottom: 0;
+    padding: 6px 10px;
+    font-size: 12px;
+}
+
+.network-select-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.network-select-container img {
+    width: 32px;
+    height: 32px;
+    margin-right: 12px;
+    border-radius: 50%;
+}
+
+.network-select-container select {
+    flex-grow: 1;
+    margin-bottom: 0;
+}
+
+#cryptoBalance {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    padding: 20px;
+    background: #1a202c;
+    border-radius: 12px;
+    text-align: center;
+    word-wrap: break-word;
+}
+
+.address-display {
+    font-size: 14px;
+    color: var(--text-secondary);
+    word-break: break-all;
+    text-align: center;
+}
+
+.address-display b {
+    color: var(--text-primary);
+}
+
+.card {
+    background: #1a202c;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border-color);
+}
+
+.accordion summary {
+    padding: 15px;
+    cursor: pointer;
+    font-weight: 500;
+    outline: none;
+}
+
+.accordion-content {
+    padding: 0 15px 15px;
+}
+
+.info-text {
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.footer-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+.footer-actions button { width: auto; }
+
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: var(--surface-color);
+    padding: 25px;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    width: 90%;
+    max-width: 350px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+.modal-content p {
+    margin: 0 0 20px;
+    font-size: 18px;
+}
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    background-color: var(--surface-color);
+    color: var(--text-primary);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-20px);
+    transition: all 0.5s ease;
+    z-index: 10000;
+}
+
+.notification.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.version-info {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+.version-info a {
+    color: var(--text-secondary);
+    text-decoration: none;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+    #authContainer, #walletContainer {
+        padding: 20px;
+    }
+    .actions-grid {
+        grid-template-columns: 1fr;
+    }
 }
