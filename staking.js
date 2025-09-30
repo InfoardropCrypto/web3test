@@ -49,6 +49,12 @@ auth.onAuthStateChanged(user => {
         currentUserId = user.uid;
         authContainer.style.display = 'none';
         stakingContainer.style.display = 'block';
+
+        listenForTVLChanges(); 
+
+        calculateTVLForNetwork(selectedNetwork);
+        calculateAndDisplayGlobalEpoch();
+
         loadWalletDetails(user.uid);
         loadCurrentStakes(user.uid);
         autoDistributeRewards(user.uid);
@@ -65,6 +71,9 @@ auth.onAuthStateChanged(user => {
 networkSelect.addEventListener('change', (event) => {
     selectedNetwork = event.target.value;
     selectedNetworkDisplay.textContent = selectedNetwork.toUpperCase();
+
+    calculateTVLForNetwork(selectedNetwork);
+
     if (currentUserId) {
         loadWalletDetails(currentUserId);
         loadCurrentStakes(currentUserId);
@@ -506,25 +515,6 @@ function calculateAndDisplayGlobalEpoch() {
     }
 }
 
-
-auth.onAuthStateChanged(user => {
-    if (user) {
-        currentUserId = user.uid;
-        authContainer.style.display = 'none';
-        stakingContainer.style.display = 'block';
-        
-        calculateAndDisplayGlobalEpoch();
-        
-        loadWalletDetails(user.uid);
-        loadCurrentStakes(user.uid);
-        autoDistributeRewards(user.uid);
-        loadProposals();
-        updateGovernanceUIState();
-        updateVotingPower(user.uid);
-    } else {
-    }
-});
-
 function loadCurrentStakes(userId) {
     activeRewardIntervals.forEach(clearInterval);
     activeRewardIntervals = [];
@@ -707,6 +697,20 @@ function displayProposal(proposalId, proposal) {
     }
 }
 
+function getStakedAmountForNetwork(userId, network, callback) {
+    const stakesRef = database.ref(`wallets/${userId}/${network}/staking`);
+    stakesRef.once('value', stakeSnapshot => {
+        let networkStaked = 0;
+        stakeSnapshot.forEach(childSnapshot => {
+            const stake = childSnapshot.val();
+            if (stake && stake.amount) {
+                networkStaked += stake.amount;
+            }
+        });
+        callback(networkStaked);
+    });
+}
+
 createProposalButton.addEventListener('click', () => {
     if (selectedNetwork !== 'optimism') {
         proposalResult.textContent = 'Proposal creation can only be done on the Optimism network.';
@@ -715,35 +719,42 @@ createProposalButton.addEventListener('click', () => {
 
     const title = proposalTitleInput.value;
     const description = proposalDescriptionInput.value;
-    const durationHours = parseInt(proposalDurationInput.value);
+    const durationHours = parseInt(proposalDurationInput.value, 10);
 
     if (!title || !description || isNaN(durationHours) || durationHours <= 0) {
         proposalResult.textContent = 'Title, description, and a valid duration are required.';
         return;
     }
 
-    const minBalanceToPropose = 100;
-    if (walletBalance < minBalanceToPropose) {
-        proposalResult.textContent = `You need at least ${minBalanceToPropose} OP to create a proposal.`;
-        return;
-    }
+    const minStakeToPropose = 100;
 
-    const proposalId = generateTransactionHash();
-    const newProposal = {
-        proposerId: currentUserId,
-        title,
-        description,
-        network: 'optimism',
-        createdAt: firebase.database.ServerValue.TIMESTAMP,
-        durationHours: durationHours,
-        status: 'pending'
-    };
+    getStakedAmountForNetwork(currentUserId, 'optimism', (stakedAmount) => {
+        if (stakedAmount < minStakeToPropose) {
+            proposalResult.textContent = `You need at least ${minStakeToPropose} staked OP to create a proposal. Your current staked amount is ${stakedAmount.toFixed(4)} OP.`;
+            return;
+        }
 
-    database.ref(`proposals/${proposalId}`).set(newProposal)
-        .then(() => {
-            proposalResult.textContent = 'Proposal created successfully!';
-        }).catch(error => proposalResult.textContent = `Error: ${error.message}`);
+        const proposalId = generateTransactionHash();
+        const newProposal = {
+            proposerId: currentUserId,
+            title,
+            description,
+            network: 'optimism',
+            createdAt: firebase.database.ServerValue.TIMESTAMP,
+            durationHours: durationHours,
+            status: 'pending'
+        };
+
+        database.ref(`proposals/${proposalId}`).set(newProposal)
+            .then(() => {
+                proposalResult.textContent = 'Proposal created successfully!';
+                proposalTitleInput.value = '';
+                proposalDescriptionInput.value = '';
+                proposalDurationInput.value = '';
+            }).catch(error => proposalResult.textContent = `Error: ${error.message}`);
+    });
 });
+
 
 function castVote(proposalId, choice) {
     if (!currentUserId) {
@@ -915,3 +926,71 @@ autoCompoundCheckbox.addEventListener('change', () => {
         alert("Auto-Stake Rewards is DISABLED. Your rewards will be accumulated but not automatically added to your stake. You will need to manually claim rewards, which will incur a gas fee.");
     }
 });
+
+function listenForTVLChanges() {
+    const walletsRef = database.ref('wallets');
+    const tvlValueElement = document.getElementById('tvlValue');
+
+    walletsRef.on('value', (snapshot) => {
+        let totalTVL = 0;
+        snapshot.forEach((userSnapshot) => {
+            userSnapshot.forEach((networkSnapshot) => {
+                const stakingNode = networkSnapshot.child('staking');
+                stakingNode.forEach((stakeSnapshot) => {
+                    const stake = stakeSnapshot.val();
+                    if (stake && typeof stake.amount === 'number') {
+                        totalTVL += stake.amount;
+                    }
+                });
+            });
+        });
+
+        tvlValueElement.textContent = totalTVL.toLocaleString('en-US', { 
+            minimumFractionDigits: 4, 
+            maximumFractionDigits: 4 
+        });
+    }, (error) => {
+        console.error("Gagal membaca data TVL:", error);
+        tvlValueElement.textContent = "Error";
+    });
+}
+
+let tvlListener = null;
+
+/**
+ * Fungsi ini MENGHITUNG TVL untuk JARINGAN TERTENTU pada satu waktu.
+ * @param {string} network - Nama jaringan yang akan dihitung.
+ */
+function calculateTVLForNetwork(network) {
+    const walletsRef = database.ref('wallets');
+    const tvlValueElement = document.getElementById('tvlValue');
+    const networkTicker = network.toUpperCase();
+
+    tvlValueElement.textContent = 'Calculating...';
+    if (tvlListener) {
+        walletsRef.off('value', tvlListener);
+    }
+    tvlListener = walletsRef.on('value', (snapshot) => {
+        let networkTotalTVL = 0;
+        
+        snapshot.forEach((userSnapshot) => {
+            if (userSnapshot.hasChild(network)) {
+                const stakingNode = userSnapshot.child(`${network}/staking`);
+                stakingNode.forEach((stakeSnapshot) => {
+                    const stake = stakeSnapshot.val();
+                    if (stake && typeof stake.amount === 'number') {
+                        networkTotalTVL += stake.amount;
+                    }
+                });
+            }
+        });
+
+        tvlValueElement.textContent = `${networkTotalTVL.toLocaleString('en-US', { 
+            minimumFractionDigits: 4, 
+            maximumFractionDigits: 4 
+        })} ${networkTicker}`;
+    }, (error) => {
+        console.error(`Gagal membaca data TVL untuk ${network}:`, error);
+        tvlValueElement.textContent = "Error";
+    });
+}
