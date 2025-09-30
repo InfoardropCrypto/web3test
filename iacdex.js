@@ -39,24 +39,103 @@ const modalGasFee = document.getElementById('modalGasFee');
 const confirmSwapButton = document.getElementById('confirmSwapButton');
 const rejectSwapButton = document.getElementById('rejectSwapButton');
 
+document.addEventListener("DOMContentLoaded", function() {
+    const tokenOptions = [
+        { value: "eth", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png", text: "Ethereum" },
+        { value: "optimism_eth", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/11840.png", text: "Optimism Network" },
+        { value: "base_eth", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/27716.png", text: "Base Network" },
+        { value: "optimism", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/11840.png", text: "Optimism" },
+        { value: "lido", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/8000.png", text: "Lido Dao" },
+        { value: "steth", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/8085.png", text: "Lido Staked Ether" },
+        { value: "usdc_erc20", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png", text: "USDC_ERC20" },
+        { value: "usdt_erc20", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/825.png", text: "USDT_ERC20" },
+        { value: "weth", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/2396.png", text: "WETH" },
+        { value: "sol", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/5426.png", text: "Solana" },
+        { value: "jup", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/29210.png", text: "Jupiter" },
+        { value: "cosmos", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/3794.png", text: "Cosmos" },
+        { value: "pepe", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/24478.png", text: "Pepe" },
+        { value: "supra", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/34240.png", text: "Supra" },
+        { value: "sui", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/20947.png", text: "Sui" },
+        { value: "walrus", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/36119.png", text: "Walrus" },
+        { value: "ika", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/37454.png", text: "Ika" },
+        { value: "haedal", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/36369.png", text: "Haedal" },
+        { value: "hasui", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/29402.png", text: "Haedal Staked Sui" },
+        { value: "deep", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/33391.png", text: "DeepBook" },
+        { value: "ink", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/36851.png", text: "INK" },
+        { value: "pengu", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/34466.png", text: "PENGU" },
+        { value: "xrp", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/52.png", text: "XRP" },
+        { value: "bsc", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png", text: "BSC Network" },
+        { value: "usdt_bep20", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/825.png", text: "USDT_BEP20" },
+        { value: "succinct", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/37593.png", text: "Succinct" },
+        { value: "near", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/6535.png", text: "Near Network" },
+        { value: "zerogravity", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/38337.png", text: "0G Network" },
+        { value: "cetus", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/25114.png", text: "Cetus" },
+        { value: "ns", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/32942.png", text: "Sui Name Service" },
+        { value: "sca", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/29679.png", text: "Scallop" },
+        { value: "blue", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/8724.png", text: "Bluefin" },
+        { value: "navx", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/29296.png", text: "Navi Protocol" },
+        { value: "usdt_sui", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/825.png", text: "USDT_SUI" },
+        { value: "usdc_sui", image: "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png", text: "USDC_SUI" },
+    ];
 
+    const fromNetworkSelect = document.getElementById('fromNetwork');
+    const toNetworkSelect = document.getElementById('toNetwork');
+
+    function populateSelect(selectElement) {
+        tokenOptions.forEach(optionData => {
+            const option = document.createElement('option');
+            option.value = optionData.value;
+            option.setAttribute('data-image', optionData.image);
+            option.textContent = optionData.text;
+            selectElement.appendChild(option);
+        });
+    }
+
+    populateSelect(fromNetworkSelect);
+    populateSelect(toNetworkSelect);
+    if (fromNetworkSelect.options.length > 0) {
+        fromNetworkSelect.value = 'eth';
+    }
+    if (toNetworkSelect.options.length > 0) {
+        toNetworkSelect.value = 'usdc_erc20';
+    }
+});
 
 const tickerMap = {
-    eth: 'ETH',
-    lido: 'LDO',
-    steth: 'stETH',
-    weth: 'ETH',
-    usdc_erc20: 'USDC',
-    usdt_erc20: 'USDT',
-    optimism_eth: 'ETH',
-    optimism: 'OP',
+    eth: 'ETH', 
+    usdt_erc20: 'USDT', 
+    usdc_erc20: 'USDC', 
+    weth: 'WETH', 
+    lido: 'LIDO',
+    steth: 'StETH', 
+    optimism_eth: 'ETH', 
+    optimism: 'OP', 
+    base_eth: 'ETH', 
     sol: 'SOL',
-    jup: 'JUP',
-    cosmos: 'ATOM',
-    pepe: 'PEPE',
-    supra: 'SUPRA',
-    sui: 'SUI',
-    walrus: 'WAL',
+    jup: 'JUP', 
+    cosmos: 'ATOM', 
+    sui: 'SUI', 
+    walrus: 'WAL', 
+    ika: 'IKA', 
+    haedal: 'HAEDAL',
+    hasui: 'HASUI', 
+    deep: 'DEEP', 
+    cetus: 'CETUS', 
+    ns: 'NS',
+    sca: 'SCA', 
+    blue: 'BLUE', 
+    usdc_sui: 'USDC',
+    usdt_sui: 'USDT', 
+    navx: 'NAVX', 
+    pepe: 'PEPE', 
+    supra: 'SUPRA', 
+    xrp: 'XRP', 
+    bsc: 'BNB',
+    usdt_bep20: 'USDT', 
+    succinct: 'PROVE', 
+    pengu: 'PENGU', 
+    near: 'NEAR',
+    zerogravity: '0G',
 };
 
 const keyBySymbol = {};
@@ -84,6 +163,27 @@ const apiTokenMap = {
     supra: 'supra',
     sui: 'sui',
     walrus: 'walrus-2',
+    ika: 'ika',
+    usdc_sui: 'usd-coin',
+    usdt_sui: 'tether',
+    haedal: 'haedal',
+    hasui: 'haedal-staked-sui',
+    deep: 'deep',
+    cetus: 'cetus-protocol', 
+    ns: 'suins-token',
+    sca: 'scallop-2', 
+    blue: 'bluefin', 
+    usdc_sui: 'usd-coin',
+    usdt_sui: 'tether', 
+    navx: 'navi',
+    ink: 'ink-3',
+    pengu: 'pudgy-penguins',
+    bsc: 'binancecoin',
+    succinct: 'succinct',
+    usdt_bep20: 'tether',
+    xrp: 'ripple',
+    near: 'near',
+    zerogravity: 'zero-gravity',
 };
 
 async function fetchRealPrice(apiTokenId) {
@@ -256,7 +356,7 @@ function updateBalances() {
     }
 }
 
-let countdownTimer = 5;
+let countdownTimer = 2;
 function startCountdown() {
     const countdownInterval = setInterval(() => {
         countdownElement.textContent = `Next price update in: ${countdownTimer}s [1 minute]`;
@@ -1006,7 +1106,7 @@ async function updatePriceChart() {
                 timeBoundary.setDate(now.getDate() - 30);
                 break;
             default:
-                timeBoundary.setHours(now.getHours() - 24);
+                timeBoundary.setHours(now.getHours() - 28);
         }
         
         const filteredData = Object.entries(priceHistory)
@@ -1225,7 +1325,6 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 async function handleFuturesTrade(type) {
-    // ... (validasi awal tetap sama) ...
     const currentUser = auth.currentUser;
     if (!currentUser) {
         alert("Please connect your wallet first.");
@@ -1265,7 +1364,7 @@ async function handleFuturesTrade(type) {
     }
     
     if(fromCache) {
-        futuresResult.textContent = "Using cached entry price. Real-time price was unavailable.";
+        futuresResult.textContent = `Successfully opened a ${type} position on ${tickerMap[asset]} of size ${positionSize.toFixed(2)} USDC.`;
         futuresResult.style.color = "orange";
     } else {
          futuresResult.textContent = "";
@@ -1300,10 +1399,9 @@ async function handleFuturesTrade(type) {
     const marginRatioForLiquidation = 1.0; 
     if (type === 'long') {
         liquidationPrice = entryPrice * (1 - (marginRatioForLiquidation / leverage));
-    } else { // short
+    } else {
         liquidationPrice = entryPrice * (1 + (marginRatioForLiquidation / leverage));
     }
-    // Pastikan harga likuidasi tidak negatif
     liquidationPrice = Math.max(0, liquidationPrice); 
     
     const tradeData = {
@@ -1318,7 +1416,7 @@ async function handleFuturesTrade(type) {
         status: 'open',
         takeProfit: !isNaN(takeProfit) ? takeProfit : null,
         stopLoss: !isNaN(stopLoss) ? stopLoss : null,
-        liquidationPrice: liquidationPrice, // Simpan harga likuidasi
+        liquidationPrice: liquidationPrice,
     };
     
     const updates = {};
@@ -1370,7 +1468,6 @@ async function handleFuturesTrade(type) {
 }
 
 function displayOpenPositions() {
-    // ... (kode awal fungsi tetap sama)
     const currentUser = auth.currentUser;
     if (!currentUser) return;
 
@@ -1395,18 +1492,16 @@ function displayOpenPositions() {
             listItem.className = 'position-item';
             listItem.dataset.positionData = JSON.stringify(pos); 
             listItem.id = `position-${positionId}`;
-
-            // --- PERUBAHAN BARU: Tambahkan tampilan Harga Likuidasi ---
             listItem.innerHTML = `
                 <div class="position-details">
                     <p><strong>${tickerMap[pos.asset]} ${pos.type.toUpperCase()} ${pos.leverage}x</strong></p>
-                    <p>Size: ${pos.positionSize.toFixed(2)} USD</p>
-                    <p>Entry Price: ${pos.entryPrice.toFixed(4)}</p>
+                    <p>Size: ${pos.positionSize.toFixed(5)} USD</p>
+                    <p>Entry Price: ${pos.entryPrice.toFixed(8)}</p>
                     <p>Mark Price: <span class="current-price-value">Loading...</span></p>
-                    <p class="liq-price-info">Liq. Price: <span class="liq-price-value">${pos.liquidationPrice ? pos.liquidationPrice.toFixed(4) : 'N/A'}</span></p>
+                    <p class="liq-price-info">Liq. Price: <span class="liq-price-value">${pos.liquidationPrice ? pos.liquidationPrice.toFixed(8) : 'N/A'}</span></p>
                     <p class="tp-sl-info">
-                        ${pos.takeProfit ? `TP: <span class="pnl-positive">${parseFloat(pos.takeProfit).toFixed(4)}</span>` : ''}
-                        ${pos.stopLoss ? `SL: <span class="pnl-negative">${parseFloat(pos.stopLoss).toFixed(4)}</span>` : ''}
+                        ${pos.takeProfit ? `TP: <span class="pnl-positive">${parseFloat(pos.takeProfit).toFixed(8)}</span>` : ''}
+                        ${pos.stopLoss ? `SL: <span class="pnl-negative">${parseFloat(pos.stopLoss).toFixed(8)}</span>` : ''}
                     </p>
                     <p>PnL: <span class="pnl-value">Loading...</span></p>
                 </div>
@@ -1466,18 +1561,15 @@ async function closePosition(positionId, positionData, reason = null) {
 
     let finalPnl = 0;
     
-    // Check if the reason for closing is liquidation
     if (reason && reason.startsWith('Liquidation:')) {
-        // When liquidated, the PnL is the total loss of the initial collateral
         finalPnl = -positionData.collateral;
     } else {
-        // Standard PnL calculation for manual close, TP, or SL
         const positionValueAtEntry = positionData.positionSize;
         const finalPositionValue = (closingPrice / positionData.entryPrice) * positionValueAtEntry;
 
         if (positionData.type === 'long') {
             finalPnl = finalPositionValue - positionValueAtEntry;
-        } else { // short
+        } else {
             finalPnl = positionValueAtEntry - finalPositionValue;
         }
     }
@@ -1489,7 +1581,6 @@ async function closePosition(positionId, positionData, reason = null) {
     try {
         const snapshot = await collateralBalanceRef.once('value');
         const currentBalance = parseFloat(snapshot.val()) || 0;
-        // Ensure amountToReturn is not negative before adding to balance
         const newBalance = currentBalance + Math.max(0, amountToReturn);
 
         const updates = {};
@@ -1593,32 +1684,30 @@ async function refreshPnlDisplay() {
         const pnlValueSpan = item.querySelector('.pnl-value');
         const currentPriceSpan = item.querySelector('.current-price-value');
 
-        if(currentPriceSpan) currentPriceSpan.textContent = currentPrice.toFixed(4);
+        if(currentPriceSpan) currentPriceSpan.textContent = currentPrice.toFixed(8);
         if(pnlValueSpan) {
-            pnlValueSpan.textContent = `${pnl.toFixed(4)} ${tickerMap[pos.collateralAsset]}`;
+            pnlValueSpan.textContent = `${pnl.toFixed(8)} ${tickerMap[pos.collateralAsset]}`;
             pnlValueSpan.className = `pnl-value ${pnlClass}`;
         }
         
-        // --- PERUBAHAN BARU: Logika Pemicu Likuidasi, TP, dan SL ---
         let triggerReason = null;
-        // Cek Pemicu Likuidasi (Margin Call)
         if (pos.liquidationPrice) {
             if (pos.type === 'long' && currentPrice <= pos.liquidationPrice) {
-                triggerReason = `Liquidation: Price hit ${pos.liquidationPrice.toFixed(4)}`;
+                triggerReason = `Liquidation: Price hit ${pos.liquidationPrice.toFixed(8)}`;
             } else if (pos.type === 'short' && currentPrice >= pos.liquidationPrice) {
-                triggerReason = `Liquidation: Price hit ${pos.liquidationPrice.toFixed(4)}`;
+                triggerReason = `Liquidation: Price hit ${pos.liquidationPrice.toFixed(8)}`;
             }
         }
         
         if (!triggerReason) {
             if (pos.takeProfit && pos.type === 'long' && currentPrice >= pos.takeProfit) {
-                triggerReason = `Take Profit hit at ${pos.takeProfit.toFixed(4)}`;
+                triggerReason = `Take Profit hit at ${pos.takeProfit.toFixed(8)}`;
             } else if (pos.stopLoss && pos.type === 'long' && currentPrice <= pos.stopLoss) {
-                triggerReason = `Stop Loss hit at ${pos.stopLoss.toFixed(4)}`;
+                triggerReason = `Stop Loss hit at ${pos.stopLoss.toFixed(8)}`;
             } else if (pos.takeProfit && pos.type === 'short' && currentPrice <= pos.takeProfit) {
-                triggerReason = `Take Profit hit at ${pos.takeProfit.toFixed(4)}`;
+                triggerReason = `Take Profit hit at ${pos.takeProfit.toFixed(8)}`;
             } else if (pos.stopLoss && pos.type === 'short' && currentPrice >= pos.stopLoss) {
-                triggerReason = `Stop Loss hit at ${pos.stopLoss.toFixed(4)}`;
+                triggerReason = `Stop Loss hit at ${pos.stopLoss.toFixed(8)}`;
             }
         }
 
@@ -1651,3 +1740,236 @@ async function updateCollateralBalanceDisplay() {
         displayElement.textContent = 'Balance: Error';
     }
 }
+
+function formatRelativeTime(isoString) {
+    const dt = new Date(isoString);
+    const now = new Date();
+    let diffMs = now - dt;
+    if (diffMs < 0) diffMs = 0;
+    const seconds = Math.floor(diffMs / 1000);
+    if (seconds < 60) return `${seconds}s ago`;
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return `${days}d ago`;
+}
+
+function obfuscateUserId(uid) {
+    if (!uid) return 'unknown';
+    return uid.slice(0, 6) + '...';
+}
+
+function renderTradeEntry(trade) {
+    const container = document.createElement('div');
+    container.style.borderBottom = '1px solid #333';
+    container.style.padding = '8px 6px';
+    container.style.display = 'flex';
+    container.style.justifyContent = 'space-between';
+    container.style.fontSize = '13px';
+    container.style.gap = '10px';
+    container.classList.add('live-trade-entry');
+    const pair = trade.network || 'N/A';
+    const fromAmount = trade.amount || '0';
+    const toAmount = trade.amountReceived || trade.result || '0';
+    const priceDisplay = trade.priceDisplay || trade.price || '';
+
+    const left = document.createElement('div');
+    left.innerHTML = `<strong>${pair}</strong>`;
+
+    const middle = document.createElement('div');
+    middle.innerHTML = `
+        <div>From: ${parseFloat(fromAmount).toFixed(4)}</div>
+        <div>To: ${parseFloat(toAmount).toFixed(4)}</div>
+        <div style="font-size:11px; color:#aaa;">Rate: ${priceDisplay}</div>
+    `;
+
+    const right = document.createElement('div');
+    right.style.textAlign = 'right';
+    const user = obfuscateUserId(trade.sender || trade.recipient || 'anon');
+    const timeAgo = formatRelativeTime(trade.timestamp || new Date().toISOString());
+    right.innerHTML = `
+        <div>Address: <span style="color:#00ffa2;">${user}</span></div>
+        <div style="font-size:11px; color:#bbb;">${timeAgo}</div>
+    `;
+
+    container.appendChild(left);
+    container.appendChild(middle);
+    container.appendChild(right);
+
+    return container;
+}
+
+const renderedTradeIds = new Set();
+let liveTrades = [];
+let filterDebounceTimer = null;
+
+function initLiveTradeFeed() {
+    const feedEl = document.getElementById('liveTradeFeed');
+    const pairFilter = document.getElementById('liveTradePairFilter');
+    const minAmountInput = document.getElementById('liveTradeMinAmount');
+
+    if (!feedEl) return;
+
+    const tradesRef = database.ref('transactions/allnetwork');
+
+    function passesFilter(trade) {
+        const selectedPair = pairFilter?.value || 'all';
+        if (selectedPair !== 'all') {
+            if (!trade.network || trade.network.toLowerCase() !== selectedPair.toLowerCase()) {
+                return false;
+            }
+        }
+        const minAmount = parseFloat(minAmountInput?.value) || 0;
+        const amount = parseFloat(trade.amount) || 0;
+        if (amount < minAmount) return false;
+        return true;
+    }
+
+    function renderAll() {
+        feedEl.innerHTML = '';
+        renderedTradeIds.clear();
+        const toShow = liveTrades.filter(({ trade }) => passesFilter(trade));
+        toShow.forEach(({ key, trade }) => {
+            const entry = renderTradeEntry(trade);
+            entry.setAttribute('data-key', key);
+            feedEl.appendChild(entry);
+            renderedTradeIds.add(key);
+        });
+    }
+    function insertTrade(key, trade) {
+        if (liveTrades.some(item => item.key === key)) return;
+        const ts = new Date(trade.timestamp).getTime();
+        let inserted = false;
+        for (let i = 0; i < liveTrades.length; i++) {
+            const existingTs = new Date(liveTrades[i].trade.timestamp).getTime();
+            if (ts > existingTs) {
+                liveTrades.splice(i, 0, { key, trade });
+                inserted = true;
+                break;
+            }
+        }
+        if (!inserted) {
+            liveTrades.push({ key, trade });
+        }
+        if (liveTrades.length > 300) liveTrades.pop();
+    }
+
+tradesRef.orderByChild('type').equalTo('swap').limitToLast(200).on('child_added', snapshot => {
+    const key = snapshot.key;
+    if (!key) return;
+    const trade = snapshot.val();
+    if (!trade) return;
+
+const amount = parseFloat(trade.amount) || 0;
+const network = trade.network || 'unknown';
+let usdPerUnit = 0;
+if (trade.fromPriceUSD) {
+    usdPerUnit = parseFloat(trade.fromPriceUSD);
+} else if (trade.toPriceUSD) {
+    usdPerUnit = parseFloat(trade.toPriceUSD);
+}
+swapVolumeBuffer.push({
+    timestamp: new Date(trade.timestamp).getTime(),
+    amount,
+    network,
+    usdPerUnit
+});
+
+updateVolumeDisplay();
+
+    insertTrade(key, trade);
+    if (passesFilter(trade)) {
+        const entry = renderTradeEntry(trade);
+        entry.setAttribute('data-key', key);
+        feedEl.prepend(entry);
+        renderedTradeIds.add(key);
+        entry.classList.add('new');
+        setTimeout(() => entry.classList.remove('new'), 1200);
+        while (feedEl.children.length > 200) {
+            feedEl.removeChild(feedEl.lastChild);
+        }
+    }
+});
+
+
+    function scheduleRender() {
+    clearTimeout(filterDebounceTimer);
+    filterDebounceTimer = setTimeout(() => {
+        renderAll();
+        updateVolumeDisplay();
+    }, 200);
+}
+
+
+    if (pairFilter) pairFilter.addEventListener('change', scheduleRender);
+    if (minAmountInput) minAmountInput.addEventListener('input', scheduleRender);
+
+    tradesRef.orderByChild('type').equalTo('swap').limitToLast(200).once('value', snap => {
+        liveTrades = [];
+        snap.forEach(c => {
+            const trade = c.val();
+            if (!trade) return;
+            liveTrades.push({ key: c.key, trade });
+        });
+        liveTrades.sort((a, b) => new Date(b.trade.timestamp) - new Date(a.trade.timestamp));
+        renderAll();
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initLiveTradeFeed();
+});
+
+const VOLUME_WINDOWS = {
+    '1m': 1 * 60 * 1000,
+    '5m': 5 * 60 * 1000,
+    '1h': 60 * 60 * 1000,
+    '24h': 24 * 60 * 60 * 1000
+};
+
+let swapVolumeBuffer = [];
+
+function formatUSD(num) {
+    if (isNaN(num) || num <= 0) return '$0.00';
+    return '$' + Number(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function computeVolume(windowMs, pair = 'all') {
+    const now = Date.now();
+    return swapVolumeBuffer
+        .filter(item => now - item.timestamp <= windowMs)
+        .filter(item => {
+            if (pair === 'all') return true;
+            return item.network && item.network.toLowerCase() === pair.toLowerCase();
+        })
+        .reduce((sum, it) => sum + (it.amount * (it.usdPerUnit || 0)), 0);
+}
+
+function updateVolumeDisplay() {
+    const selectedPair = document.getElementById('liveTradePairFilter')?.value || 'all';
+    const maxWindow = VOLUME_WINDOWS['24h'];
+    const now = Date.now();
+    swapVolumeBuffer = swapVolumeBuffer.filter(item => now - item.timestamp <= maxWindow);
+    const v1m = computeVolume(VOLUME_WINDOWS['1m'], 'all');
+    const v5m = computeVolume(VOLUME_WINDOWS['5m'], 'all');
+    const v1h = computeVolume(VOLUME_WINDOWS['1h'], 'all');
+    const v24h = computeVolume(VOLUME_WINDOWS['24h'], 'all');
+    const pair5m = computeVolume(VOLUME_WINDOWS['5m'], selectedPair !== 'all' ? selectedPair : 'all');
+
+    const el1m = document.getElementById('volume_1m');
+    const el5m = document.getElementById('volume_5m');
+    const el1h = document.getElementById('volume_1h');
+    const el24h = document.getElementById('volume_24h');
+    const elPair = document.getElementById('volumePair');
+
+    if (el1m) el1m.textContent = formatUSD(v1m);
+    if (el5m) el5m.textContent = formatUSD(v5m);
+    if (el1h) el1h.textContent = formatUSD(v1h);
+    if (el24h) el24h.textContent = formatUSD(v24h);
+    if (elPair) elPair.textContent = formatUSD(pair5m);
+}
+
+
+setInterval(updateVolumeDisplay, 10 * 1000);
