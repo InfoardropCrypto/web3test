@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iac.explorer.com</title>
+    <title>IAC | Explorer</title>
     <link rel="stylesheet" href="explorer.css">
 </head>
 <style>
@@ -103,16 +103,18 @@
         
         <hr>
 
-        <details open style="text-align:left;">
-          <summary>All Transactions</summary>
-          <div id="transactionsContainer">Loading…</div>
-        </details>
-
+        <button id="myTxButton" style="margin-top: 10px;">My Transactions</button>
+        <button id="allTxButton" style="margin-top: 10px; display:none;">All Transactions</button>
         <div id="pagination">
             <button id="prevButton" disabled>Previous</button>
             <span id="pageInfo">Page 1</span>
             <button id="nextButton" disabled>Next</button>
         </div>
+
+        <details open style="text-align:left;">
+          <summary>Transactions</summary>
+          <div id="transactionsContainer">Loading…</div>
+        </details>
 
         <div id="walletModal" class="modal">
           <div class="modal-content">
