@@ -5,14 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>iacdex.io</title>
     <link rel="stylesheet" href="iacdex.css">
-    <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-</head>
-
 </head>
 <body>
     <nav class="logo-container">
-        <img src="cryptologo/iac1.png" alt="img logo">
+        <img src="https://avatars.githubusercontent.com/u/174393316?v=4" alt="img logo">
         
         <button id="connectWalletButton" class="button">Connect Wallet</button>
         <p id="walletStatus">Not Connected</p>
@@ -31,65 +28,27 @@
     </div>
 
     <div class="divjup">
-    <p id="fromBalance">You're Selling </p>
-    <label for="fromNetwork"></label>
-    <select id="fromNetwork">
-        <option value="eth" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png">
-          Ethereum
-        </option>
-        <option value="optimism_eth" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/11840.png">Optimism Network</option>
-        <option value="base_eth" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/27716.png">Base Network</option>
-        <option value="optimism" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/11840.png">Optimism</option>
-        <option value="lido" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/8000.png">Lido Dao</option>
-        <option value="steth" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/8085.png">Lido Staked Ether</option>
-        <option value="usdc_erc20" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png">USDC_ERC20</option>
-        <option value="usdt_erc20" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/825.png">USDT_ERC20</option>
-        <option value="weth" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/2396.png">WETH</option>
-        <option value="sol" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/5426.png">Solana</option>
-        <option value="jup" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/29210.png">Jupiter</option>
-        <option value="cosmos" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/3794.png">Cosmos</option>
-        <option value="pepe" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/24478.png">Pepe</option>
-        <option value="supra" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/34240.png">Supra</option>
-        <option value="sui" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/20947.png">Sui</option>
-        <option value="walrus" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/36119.png">Walrus</option>
-    </select>
+        <p id="fromBalance">You're Selling </p>
+        <label for="fromNetwork"></label>
+        <select id="fromNetwork"></select>
 
-    <input type="number" class="inputjup" id="amount" step="any" placeholder="0.00">
-    <p id="afterBalance" style="font-size:12px;color:#00ffa2;margin-top:-5px;"></p>
+        <input type="number" class="inputjup" id="amount" step="any" placeholder="0.00">
+        <p id="afterBalance" style="font-size:12px;color:#00ffa2;margin-top:-5px;"></p>
 
-    
-    <div class="percentage-buttons">
-        <button onclick="setPercentage(25)">25%</button>
-        <button onclick="setPercentage(50)">50%</button>
-        <button onclick="setPercentage(75)">75%</button>
-        <button onclick="setPercentage(98.99999999999999)">100%</button>
+        <div class="percentage-buttons">
+            <button onclick="setPercentage(25)">25%</button>
+            <button onclick="setPercentage(50)">50%</button>
+            <button onclick="setPercentage(75)">75%</button>
+            <button onclick="setPercentage(98.99999999999999)">100%</button>
+        </div>
     </div>
-</div>
     
     <button id="autoSwitchButton" class="button">↑↓</button>
 
     <div class="divjup2">
         <p id="toBalance">You're Buying </p>
         <label for="toNetwork"></label>
-        <select id="toNetwork">
-               <option value="usdc_erc20" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png">USDC_ERC20</option>
-                <option value="eth" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png">Ethereum</option>
-                <option value="optimism" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/11840.png">Optimism</option>
-                <option value="base_eth" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/27716.png">Base Network</option>
-                <option value="optimism_eth" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/11840.png">Optimism Network</option>
-                <option value="lido" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/8000.png">Lido
-                Dao</option>
-                <option value="steth"
-                data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/8085.png">Lido Staked Ether</option>
-                <option value="usdt_erc20" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/825.png">USDT_ERC20</option>
-                <option value="sol" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/5426.png">Solana</option>
-                <option value="jup" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/29210.png">Jupiter</option>
-                <option value="cosmos" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/3794.png">Cosmos</option>
-                <option value="pepe" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/24478.png">Pepe</option>
-                <option value="supra" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/34240.png">Supra</option>
-                <option value="sui" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/20947.png">Sui</option>
-                <option value="walrus" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/36119.png">Walrus</option>
-        </select>
+        <select id="toNetwork"></select>
         <p class="estimatedamount" id="estimatedAmount">0</p>
     </div>
     
@@ -106,8 +65,6 @@
         <button id="swapButton" class="button">Swap</button>
         <div id="amountWarning"></div>
         
-
-        
         <p><i class="fas fa-gas-pump" style="color: #3b82f6; margin-right: 5px;"></i> Network Fee: <span id="gasFee"></span></p>
     </div>
     
@@ -116,11 +73,49 @@
     <div id="lastUpdate">Last Updated: N/A</div>
     <a href="explorer.html">| Explorer |</a>
     <a href="index.html">| Wallet |</a>
+    <a href="addlp.html">| Add Liquidity |</a>
     <a href="#futuresSection">| Futures |</a>
+    <a href="">| NFT Market |</a>
+    
 </div>
 
- <div id="chartSection" class="feature-section">
+<div id="liveTradeSection" class="feature-section">
+  <h2>🔥 Live Trades</h2>
+  <div style="margin-bottom:8px;">
+    <br>
+  </div>
+  <div id="liveTradeVolumeSummary" style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:8px;">
+  <div class="volume-box">
+    <div class="volume-label">1m Volume:</div>
+    <div class="volume-value" id="volume_1m">—</div>
+  </div>
+  <div class="volume-box">
+    <div class="volume-label">5m Volume:</div>
+    <div class="volume-value" id="volume_5m">—</div>
+  </div>
+  <div class="volume-box">
+    <div class="volume-label">1h Volume:</div>
+    <div class="volume-value" id="volume_1h">—</div>
+  </div>
+  <div class="volume-box">
+    <div class="volume-label">24h Volume:</div>
+    <div class="volume-value" id="volume_24h">—</div>
+  </div>
+  <div class="volume-box">
+    <div class="volume-label">Filtered Pair (5m):</div>
+    <div class="volume-value" id="volumePair">—</div>
+  </div>
+    <label style="margin-left:16px;">Filter Pair: Min Amount: 
+      <input type="number" id="liveTradeMinAmount" placeholder="0" step="any" style="width:100px;">
+    </label>
+</div>
+<br>
+  <div id="liveTradeFeed" style="max-height:400px; overflow-y:auto; padding:5px; background:#1f2025; border-radius:6px;">
+  </div>
+</div>
 
+
+ <div id="chartSection" class="feature-section">
     <div class="chart-container">
         <canvas id="priceChart"></canvas>
     </div>
@@ -141,6 +136,7 @@
         <option value="sol">Solana (SOL)</option>
         <option value="pepe">Pepe (PEPE)</option>
         <option value="jup">Jupiter (JUP)</option>
+        <option value="sui">Sui (SUI)</option>
     </select>
 
     <label for="collateralSelect">Collateral:</label>
@@ -226,51 +222,35 @@
     <div id="newListingSection" class="feature-section">
         <h2>🔥 New Listings</h2>
         <ul id="newListingsList">
-             <li data-token="sui">
-                <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/20947.png" alt="Sui" class="bundar">
+             <li data-token="zerogravity">
+                <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/38337.png" alt="OG Network" class="bundar">
                 <div class="listing-info">
-                    <span class="token-name">Sui</span>
-                    <span class="token-ticker">SUI</span>
+                    <span class="token-name">0G Network</span>
+                    <span class="token-ticker">0G</span>
                 </div>
                 <button class="button trade-button">Trade</button>
             </li>
-             <li data-token="supra">
-                <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/34240.png" alt="Supra" class="bundar">
+            <li data-token="bsc">
+                <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png" alt="BSC Network" class="bundar">
                 <div class="listing-info">
-                    <span class="token-name">Supra</span>
-                    <span class="token-ticker">SUPRA</span>
+                    <span class="token-name">BSC Network</span>
+                    <span class="token-ticker">BNB</span>
                 </div>
                 <button class="button trade-button">Trade</button>
             </li>
-             <li data-token="pepe">
-                <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/24478.png" alt="PEPE" class="bundar">
+            <li data-token="near">
+                <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/6535.png" alt="Near Network" class="bundar">
                 <div class="listing-info">
-                    <span class="token-name">Pepe</span>
-                    <span class="token-ticker">PEPE</span>
+                    <span class="token-name">Near Network</span>
+                    <span class="token-ticker">NEAR</span>
                 </div>
                 <button class="button trade-button">Trade</button>
             </li>
-             <li data-token="sol">
-                <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/5426.png" alt="Solana" class="bundar">
+             <li data-token="deep">
+                <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/33391.png" alt="DeepBook Protocol" class="bundar">
                 <div class="listing-info">
-                    <span class="token-name">Solana</span>
-                    <span class="token-ticker">SOL</span>
-                </div>
-                <button class="button trade-button">Trade</button>
-            </li>
-             <li data-token="cosmos">
-                <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/3794.png" alt="Cosmis" class="bundar">
-                <div class="listing-info">
-                    <span class="token-name">Cosmos</span>
-                    <span class="token-ticker">ATOM</span>
-                </div>
-                <button class="button trade-button">Trade</button>
-            </li>
-             <li data-token="jup">
-                <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/29210.png" alt="Jupiter" class="bundar">
-                <div class="listing-info">
-                    <span class="token-name">Jupiter</span>
-                    <span class="token-ticker">JUP</span>
+                    <span class="token-name">DeepBook Protocol</span>
+                    <span class="token-ticker">DEEP</span>
                 </div>
                 <button class="button trade-button">Trade</button>
             </li>
@@ -338,12 +318,13 @@
         </div>
     </div>
 
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial/dist/chartjs-chart-financial.min.js"></script>
     
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <script src="iacdex.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script src="iacdex.js"></script>
 </body>
 </html>
