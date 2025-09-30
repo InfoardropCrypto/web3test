@@ -83,7 +83,7 @@ nav p {
 }
 
 .inputjup {
-    width: 250px;
+    width: calc(100% - 22px);
     padding: 10px;
     margin: 5px 0 20px 0;
     border: 1px solid #010b1f67;
@@ -130,13 +130,14 @@ footer p {
     font-size: 12px;
 }
 .estimatedamount {
-    width: 250px;
+    width: calc(100% - 22px);
     padding: 10px;
     margin: 5px 0 20px 0;
     border: 1px solid #010b1f3d;
     border-radius: 5px;
     background-color: #010b1f3d;
     color: #fff;
+    min-height: 18px;
 }
 
 p.dark-theme {
@@ -518,13 +519,12 @@ body.dark-theme .icon-button i {
     color: #00ffa2;
 }
 
-/* General Feature Section Styling */
 .feature-section {
     background-color: #25262C;
     border-radius: 10px;
     padding: 20px;
     width: 90%;
-    max-width: 500px; /* Lebarkan sedikit untuk fitur baru */
+    max-width: 500px;
     margin: 20px auto;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -541,7 +541,6 @@ body.dark-theme .icon-button i {
     margin-bottom: 20px;
 }
 
-/* Liquidity Section */
 .user-liquidity-positions {
     margin-top: 30px;
     padding-top: 20px;
@@ -560,7 +559,6 @@ body.dark-theme .icon-button i {
     margin-bottom: 10px;
 }
 
-/* Staking Section */
 .staking-buttons {
     display: flex;
     gap: 10px;
@@ -580,7 +578,6 @@ body.dark-theme .icon-button i {
     font-size: 16px;
 }
 
-/* Analytics Page */
 .analytics-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -607,9 +604,8 @@ body.dark-theme .icon-button i {
     color: #00ffa2;
 }
 
-/* New Listings Section */
 #newListingSection {
-    max-width: 400px; /* Match the swap section width */
+    max-width: 400px;
     background-color: #25262C;
     border-radius: 10px;
     padding: 20px;
@@ -669,7 +665,7 @@ body.dark-theme .icon-button i {
 .trade-button {
     padding: 8px 15px;
     font-size: 14px;
-    width: auto; /* Override full width from .button */
+    width: auto;
     background-color: #00c6a2;
     border: none;
     border-radius: 5px;
@@ -682,7 +678,6 @@ body.dark-theme .icon-button i {
     background-color: #00ffa2;
 }
 
-/* Chart Section Styles */
 .chart-container {
     width: 100%;
     height: 300px;
@@ -690,6 +685,22 @@ body.dark-theme .icon-button i {
     background-color: #010b1f3d;
     border-radius: 10px;
     padding: 10px;
+    position: relative;
+}
+
+#chartMessageOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #A0A0A0;
+    font-size: 16px;
+    pointer-events: none;
+    z-index: 10;
 }
 
 .chart-controls {
@@ -719,7 +730,6 @@ body.dark-theme .icon-button i {
     background-color: #444;
 }
 
-/* Top Gainers & Losers Section */
 #topGainersSection, #topLosersSection {
     max-width: 400px;
     background-color: #25262C;
@@ -772,7 +782,7 @@ body.dark-theme .icon-button i {
 
 .loser-price-change {
     font-size: 14px;
-    color: #ff4d4d; /* Warna merah untuk Top Losers */
+    color: #ff4d4d;
 }
 
 .list-item-details {
@@ -785,7 +795,6 @@ body.dark-theme .icon-button i {
     margin-bottom: 5px;
 }
 
-/* Custom Modal Styling */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -910,7 +919,6 @@ body.dark-theme .icon-button i {
   font-size: 14px;
 }
 
-/* Styling untuk daftar posisi futures */
 #openPositionsSection h3 {
     color: #00ffa2;
 }
@@ -953,11 +961,11 @@ body.dark-theme .icon-button i {
 }
 
 .pnl-positive {
-    color: #00ffa2; /* Hijau untuk profit */
+    color: #00ffa2;
 }
 
 .pnl-negative {
-    color: #ff4d4d; /* Merah untuk loss */
+    color: #ff4d4d;
 }
 
 .close-button {
@@ -987,4 +995,195 @@ body.dark-theme .icon-button i {
 
 .close-button:hover {
     background-color: #e60000;
+}
+
+.live-trade-entry:hover {
+    background: rgba(0, 255, 162, 0.05);
+}
+
+.live-trade-entry.new {
+    animation: flash 1s ease-out;
+    background-color: rgba(0, 255, 162, 0.15);
+}
+
+@keyframes flash {
+    0% { background-color: rgba(0, 255, 162, 0.35); }
+    100% { background-color: transparent; }
+}
+
+/* Container live trade */
+#liveTradeSection {
+    position: relative;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+#liveTradeFeed {
+    background: #1f2025;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 10px;
+    max-height: 420px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,255,162,0.6) transparent;
+}
+
+/* WebKit scrollbar */
+#liveTradeFeed::-webkit-scrollbar {
+    width: 10px;
+}
+#liveTradeFeed::-webkit-scrollbar-track {
+    background: transparent;
+}
+#liveTradeFeed::-webkit-scrollbar-thumb {
+    background: rgba(0,255,162,0.5);
+    border-radius: 6px;
+}
+
+/* Entry */
+.live-trade-entry {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    margin-bottom: 6px;
+    background: #25262c;
+    border: 1px solid #2f3240;
+    border-radius: 6px;
+    font-size: 13px;
+    line-height: 1.2;
+    transition: background 0.3s, transform 0.15s;
+    position: relative;
+}
+
+/* New highlight animation */
+.live-trade-entry.new {
+    animation: flash 1s ease-out;
+}
+
+@keyframes flash {
+    0% { background-color: rgba(0, 255, 162, 0.35); }
+    100% { background-color: #25262c; }
+}
+
+/* Sections inside entry */
+.live-trade-entry > div {
+    flex: 1 1 auto;
+    min-width: 80px;
+}
+
+/* Left: pair */
+.live-trade-entry strong {
+    display: block;
+    font-size: 14px;
+    color: #00ffa2;
+}
+
+/* Middle: amounts */
+.live-trade-entry .amounts {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+/* Right: user & time */
+.live-trade-entry .meta {
+    text-align: right;
+    font-size: 11px;
+    color: #bbb;
+}
+
+/* Obfuscated user styling */
+.live-trade-entry .meta .user {
+    color: #00c6a2;
+    font-weight: 600;
+}
+
+/* Filters row adjustments */
+#liveTradePairFilter,
+#liveTradeMinAmount {
+    background: #1c1d21;
+    border: 1px solid #333;
+    color: #fff;
+    padding: 6px 8px;
+    border-radius: 5px;
+    font-size: 12px;
+    margin-right: 8px;
+}
+
+#liveTradeSection label {
+    font-size: 12px;
+    color: #aaa;
+}
+
+/* Empty state */
+#liveTradeFeed.empty::after {
+    content: "No trades to display.";
+    display: block;
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    font-style: italic;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .live-trade-entry {
+        flex-direction: column;
+        gap: 6px;
+    }
+    .live-trade-entry .meta {
+        text-align: left;
+    }
+}
+
+#liveTradeVolumeSummary {
+    gap: 12px;
+}
+
+.volume-box {
+    background: #1f2330;
+    border: 1px solid #2f3240;
+    border-radius: 6px;
+    padding: 8px 12px;
+    display: flex;
+    flex-direction: column;
+    min-width: 160px;
+}
+
+.volume-label {
+    font-size: 11px;
+    color: #888;
+    margin-bottom: 4px;
+}
+
+.volume-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #00ffa2;
+}
+
+.volume-box {
+    background: #1f2330;
+    border: 1px solid #2f3240;
+    border-radius: 6px;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    min-width: 120px;
+}
+
+.volume-label {
+    font-size: 10px;
+    color: #888;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.volume-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: #00ffa2;
 }
