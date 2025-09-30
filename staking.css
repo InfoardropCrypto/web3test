@@ -444,3 +444,37 @@ select {
 input {
   color: white;
 }
+
+.tvl-container {
+    margin: 20px 0;
+    padding: 15px;
+    border-top: 1px dashed #fff;
+    border-bottom: 1px dashed #fff;
+}
+
+.tvl-container h2 {
+    margin: 0;
+    font-size: 1.2em;
+}
+
+#tvlValue {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.ntwrk {
+    padding: 20px;
+    background-color: #000;
+    color: #fff;
+    border-radius: 0;
+    box-shadow: none;
+    border: 2px solid #fff;
+    margin: 20px;
+    text-align: left;
+    word-wrap: break-word;
+    word-break: break-all;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
