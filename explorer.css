@@ -1,4 +1,3 @@
-/* Gaya Umum */
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
@@ -8,7 +7,6 @@ body {
     text-align: center;
 }
 
-/* ===== Gaya untuk Kontainer Login ===== */
 #authContainer {
     max-width: 400px;
     margin: 50px auto;
@@ -74,7 +72,6 @@ body {
     min-height: 20px;
 }
 
-/* Tombol Auth */
 .auth-button {
     padding: 10px 20px;
     border: none;
@@ -90,7 +87,6 @@ body {
     background-color: skyblue;
 }
 
-/* Input dan Tombol Umum */
 .searchinputjup {
     flex: 1;
     padding: 10px;
@@ -122,7 +118,6 @@ button:hover:not(:disabled) {
     background-color: #4e432b;
 }
 
-/* Transaksi */
 .transaction {
     border: 1px solid #eee;
     background: #f9f9f9;
@@ -148,7 +143,6 @@ button:hover:not(:disabled) {
     color: skyblue;
 }
 
-/* Detail */
 .detailstx {
     color: #f2bb19;
     font-family: Monospace;
@@ -159,7 +153,6 @@ button:hover:not(:disabled) {
     background-color: #00000084;
 }
 
-/* Gaya untuk dompet pengguna (BARU) */
 .my-wallet {
     background-color: #0c0c0d8c;
     border: 1px solid skyblue;
@@ -173,14 +166,12 @@ button:hover:not(:disabled) {
   margin: 8px 0;
   font-family: monospace;
   font-size: 1.1em;
-  color: #fff; /* Pastikan teks terlihat di background gelap */
+  color: #fff;
 }
 #myBalanceDetails strong {
-  color: #f2bb19; /* Samakan warna dengan detail lainnya */
+  color: #f2bb19;
 }
 
-
-/* Mempool */
 #mempoolContainer {
     padding: 20px;
     background-color: #f9f9f9;
@@ -189,7 +180,6 @@ button:hover:not(:disabled) {
     align-items: center;
 }
 
-/* Footer */
 footer {
     margin: 50px 0;
 }
@@ -199,14 +189,12 @@ footer p {
     font-size: 12px;
 }
 
-/* Panjang Text */
 .long-text {
     word-break: break-all;
     font-family: monospace;
     font-size: 0.9em;
 }
 
-/* Pagination */
 #pagination {
     padding: 20px;
     display: flex;
@@ -219,7 +207,6 @@ footer p {
     font-weight: bold;
 }
 
-/* ===== Gaya untuk Link Wallet ===== */
 .wallet-link {
     color: skyblue;
     text-decoration: underline;
@@ -231,7 +218,6 @@ footer p {
     color: skyblue;
 }
 
-/* ===== Gaya untuk Modal ===== */
 .modal {
     display: none; 
     position: fixed; 
@@ -276,7 +262,6 @@ footer p {
     cursor: pointer;
 }
 
-/* ===== Gaya untuk Teks Transaksi Terakhir ===== */
 .last-tx {
     font-size: 0.9em;
     color: #6c757d;
@@ -284,7 +269,6 @@ footer p {
     font-family: monospace;
 }
 
-/* ✨ Efek Kelap-Kelip Neon Pixel untuk Transaksi Baru */
 .transaction.new-tx {
   background-color: #000000;
   color: #39ff14;
