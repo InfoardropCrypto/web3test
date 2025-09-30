@@ -16,13 +16,13 @@
     <div id="stakingContainer" style="display: none;">
         <nav class="logo-container">
             <h1>ICfinance</h1>
-            <button id="connectWalletButton" class="button" onclick="confirm('Connected')">Connected</button>
+            <button id="connectWalletButton" class="button" onclick="confirm(`Connected ${walletAddress}`)">Connected</button>
             <button id="themeToggle" class="icon-button">
                 <i class="fas fa-sun" id="themeIcon"></i>
             </button>
         </nav>
 
-        <div class="wallet-details">
+        <div class="ntwrk">
           <select id="networkSelect">
                 <option value="optimism" data-image="https://raw.githubusercontent.com/InfoardropCrypto/iac/refs/heads/main/cryptologo/optimism.png">Optimism</option>
                 <option value="steth" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/8085.png">Lido Staked Ether</option>
@@ -30,12 +30,26 @@
                 <option value="sol" data-image="https://raw.githubusercontent.com/InfoardropCrypto/iac/refs/heads/main/cryptologo/solana.jpg">Solana</option>
                 <option value="sui" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/20947.png">Sui</option>
                 <option value="walrus" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/36119.png">Walrus</option>
+                <option value="pengu" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/34466.png">Pengu</option>
+                <option value="succinct" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/37593.png">Succinct</option>
+                <option value="jup" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/29210.png">Jupiter</option>
+                <option value="xrp" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/52.png">XRP Network</option>
+                <option value="bsc" data-image="https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png">BSC Network</option>
             </select>
-            <p style="display:none;">Wallet Address: <span id="walletAddress">Loading...</span></p>
             <div>
-              <img id="networkIcon" src="iac.png" alt=" Icon " style="text-align:;border-radius:100%;width:20px;">
-              <p>Wallet Balance : <span id="walletBalance">0.0000</span> <span id="selectedNetwork">Loading...</span></p>
+              <p>
+              Wallet Balance : <span id="walletBalance">0.0000</span> <span id="selectedNetwork">Loading...</span> <img id="networkIcon" src="iac.png" alt="Icon" style="border-radius:100%;width:20px;"></p>
             </div>
+            <p><strong>Your Voting Power:</strong> <span id="votingPower">0</span></p>
+            <p><strong>Staking Balance:</strong></p>
+            <div id="votingPowerBreakdown"></div>
+            </div>
+        <div class="wallet-details">
+            
+            <div class="tvl-container">
+              <h2>Total Value Locked (TVL): <span id="tvlValue">Loading...</span></h2>
+            </div>
+            <p style="display:none;">Wallet Address: <span id="walletAddress">Loading...</span></p>
         </div>
 
         <div class="stake-form">
@@ -44,7 +58,7 @@
             
             <select id="validatorSelect">
               <option value="">-- Select Validator --</option>
-              <option value="mining.js" data-apy="200">Mining.js</option>
+              <option value="mining.js" data-apy="50">Mining.js</option>
               <option value="ethereum.org" data-apy="5">Ethereum</option>
               <option value="optimism.org" data-apy="15">Optimism</option>
               <option value="lido.fi" data-apy="2.9">Lido</option>
@@ -85,8 +99,6 @@
                 
             </div>
             
-            <p><strong>Your Voting Power:</strong> <span id="votingPower">0</span></p>
-            <div id="votingPowerBreakdown"></div>
             <p id="proposalResult"></p>
 
             <div class="vote-section">
