@@ -41,11 +41,16 @@ const modalWalletAddress = document.getElementById('modalWalletAddress');
 const modalWalletBalances = document.getElementById('modalWalletBalances');
 const closeButton = document.querySelector('.close-button');
 const networkFilter = document.getElementById('networkFilter');
-const TRANSACTIONS_PER_PAGE = 25;
+const myTxButton = document.getElementById('myTxButton');
+const allTxButton = document.getElementById('allTxButton');
+
+
+const TRANSACTIONS_PER_PAGE = 20;
 let allTransactionKeys = [];
 let currentPage = 1;
 let totalPages = 1;
 let allTransactionsCache = {};
+let isMyTxViewActive = false;
 
 showRegister.addEventListener('click', (e) => {
     e.preventDefault();
@@ -145,6 +150,10 @@ auth.onAuthStateChanged(user => {
         registerForm.style.display = 'none';
         loginForm.style.display = 'block';
         
+        isMyTxViewActive = false;
+        allTxButton.style.display = 'none';
+        myTxButton.style.display = 'inline-block';
+
         if (myBalanceDetails) myBalanceDetails.innerHTML = '';
         if (transactionsContainer) transactionsContainer.innerHTML = '<p>Silakan login untuk melihat transaksi.</p>';
         allTransactionsCache = {};
@@ -162,9 +171,11 @@ function displayMyBalance(userId) {
             const networks = snapshot.val();
             let balancesHTML = '';
             for (const networkKey in networks) {
-                const balance = networks[networkKey].balance || 0;
                 const displayName = networkKey.toUpperCase().replace('', '');
-                balancesHTML += `<p><strong>${displayName}:</strong> ${balance}</p>`;
+                const balance = formatBalance(networks[networkKey].balance);
+                if (balance !== null) {
+                    balancesHTML += `<p><strong>${networkKey.toUpperCase()}:</strong> ${balance}</p>`;
+                }
             }
             myBalanceDetails.innerHTML = balancesHTML || '<p>Informasi saldo tidak ditemukan.</p>';
         } else {
@@ -176,25 +187,76 @@ function displayMyBalance(userId) {
 }
 
 
-networkFilter.addEventListener('change', () => {
-  const query = searchInput.value;
-  const network = networkFilter.value;
-  const filtered = filterTransactions(query, allTransactionsCache, network);
-  allTransactionKeys = Object.keys(filtered).sort((a, b) => {
-    return new Date(filtered[b].timestamp) - new Date(filtered[a].timestamp);
-  });
-  totalPages = Math.ceil(allTransactionKeys.length / TRANSACTIONS_PER_PAGE);
-  currentPage = 1;
-  renderCurrentPage();
+networkFilter.addEventListener('change', applyFiltersAndRender);
+searchInput.addEventListener('input', applyFiltersAndRender);
+
+myTxButton.addEventListener('click', () => {
+    isMyTxViewActive = true;
+    myTxButton.style.display = 'none';
+    allTxButton.style.display = 'inline-block';
+    applyFiltersAndRender();
 });
+
+allTxButton.addEventListener('click', () => {
+    isMyTxViewActive = false;
+    allTxButton.style.display = 'none';
+    myTxButton.style.display = 'inline-block';
+    applyFiltersAndRender();
+});
+
+function applyFiltersAndRender() {
+    const user = auth.currentUser;
+    if (!user && isMyTxViewActive) {
+        transactionsContainer.innerHTML = '<p>Please log in to see your transactions.</p>';
+        return;
+    }
+
+    let transactionsToFilter = allTransactionsCache;
+
+    if (isMyTxViewActive) {
+        const myUid = user.uid;
+        transactionsToFilter = Object.entries(allTransactionsCache).reduce((filtered, [txid, tx]) => {
+            if (tx.sender === myUid || tx.recipient === myUid) {
+                filtered[txid] = tx;
+            }
+            return filtered;
+        }, {});
+    }
+    
+    const query = searchInput.value;
+    const network = networkFilter.value;
+    const filteredTransactions = filterTransactions(query, transactionsToFilter, network);
+
+    allTransactionKeys = Object.keys(filteredTransactions).sort((a, b) => {
+        return new Date(filteredTransactions[b].timestamp) - new Date(filteredTransactions[a].timestamp);
+    });
+    
+    totalPages = Math.ceil(allTransactionKeys.length / TRANSACTIONS_PER_PAGE);
+    currentPage = 1;
+    renderCurrentPage();
+}
+
 
 function filterTransactions(query, transactions, networkFilter = '') {
   if (!query && !networkFilter) return transactions;
   const lowerQuery = query.toLowerCase();
+  
   return Object.entries(transactions).reduce((filtered, [txid, tx]) => {
-    const matchesQuery = txid.toLowerCase().includes(lowerQuery);
+    const sender = (tx.sender || '').toLowerCase();
+    const recipient = (tx.recipient || '').toLowerCase();
+    const memo = (tx.memo || '').toLowerCase();
+
+    const matchesQuery =
+      txid.toLowerCase().includes(lowerQuery) ||
+      sender.includes(lowerQuery) ||
+      recipient.includes(lowerQuery) ||
+      memo.includes(lowerQuery);
+
     const matchesNetwork = !networkFilter || tx.network === networkFilter;
-    if (matchesQuery && matchesNetwork) filtered[txid] = tx;
+
+    if (matchesQuery && matchesNetwork) {
+      filtered[txid] = tx;
+    }
     return filtered;
   }, {});
 }
@@ -207,7 +269,7 @@ function createTransactionElement(transactionId, transaction, isNew) {
     const senderLink = sender !== 'anonym' ? `<span class="wallet-link" onclick="showWalletDetails('${sender}')">${sender}</span>` : 'anonym';
     const recipientLink = recipient !== 'anonym' ? `<span class="wallet-link" onclick="showWalletDetails('${recipient}')">${recipient}</span>` : 'anonym';
     
-    const contractAddress = contractAddresses[transaction.network] || '000000000000000000000000020';
+    const contractAddress = contractAddresses[transaction.network] || '0000000000000000000000000020';
     const contractAddressLink = contractAddress !== 'N/A' ? `<span class="wallet-link" onclick="showWalletDetails('${contractAddress}')">${contractAddress}</span>` : 'N/A';
 
     const transactionElement = document.createElement('div');
@@ -229,13 +291,18 @@ function createTransactionElement(transactionId, transaction, isNew) {
         <p><strong>Received:</strong> <font style="color:white;background-color:#4dcc4d;border-radius:100px;">⤵</font>${transaction.amountReceived}</p>
         <p><strong>Source:</strong> ${transaction.network}</p>
         <p><strong>Contract Token Address:</strong> ${contractAddressLink}</p>
+        <div class="top-holders" id="holders-${transactionId}"></div>
         <p style="color:#7f7e7ecf;">################################</p>
         <p><strong>Memo:</strong> ${memo}</p>
         <p><strong>Gas fee:</strong> ${transaction.gasFee}</p>
         <p><strong>Time:</strong> ${new Date(transaction.timestamp).toLocaleString('en-GB')}</p>
         <hr>
     `;
-    
+
+if (contractAddress && contractAddress !== 'N/A') {
+    loadTopHolders(contractAddress, transactionId);
+}
+
     if (isNew) {
         setTimeout(() => {
             transactionElement.classList.remove('new-tx');
@@ -250,17 +317,15 @@ function displayTransactions(transactions) {
     transactionsContainer.innerHTML = ''; 
     
     if (transactions && Object.keys(transactions).length > 0) {
-        const sortedTransactionIds = Object.keys(transactions).sort((a, b) => {
-            return new Date(transactions[b].timestamp) - new Date(transactions[a].timestamp);
+        allTransactionKeys.slice((currentPage - 1) * TRANSACTIONS_PER_PAGE, currentPage * TRANSACTIONS_PER_PAGE)
+          .forEach(transactionId => {
+            const transaction = allTransactionsCache[transactionId];
+            if (transaction) {
+              const isNew = (Date.now() - new Date(transaction.timestamp)) < 3 * 60 * 1000;
+              const transactionElement = createTransactionElement(transactionId, transaction, isNew);
+              transactionsContainer.appendChild(transactionElement);
+            }
         });
-
-        sortedTransactionIds.forEach(transactionId => {
-            const transaction = transactions[transactionId];
-            const isNew = (Date.now() - new Date(transaction.timestamp)) < 3 * 60 * 1000;
-            const transactionElement = createTransactionElement(transactionId, transaction, isNew);
-            transactionsContainer.appendChild(transactionElement);
-        });
-
     } else {
         transactionsContainer.innerHTML = '<p>No transactions found. -_-</p>';
     }
@@ -272,22 +337,102 @@ function showWalletDetails(walletAddress) {
     modalWalletAddress.textContent = walletAddress;
     modalWalletBalances.innerHTML = '<em>Loading balances...</em>';
     walletModal.style.display = 'block';
+    let tokenName = null;
+    for (const [name, addr] of Object.entries(contractAddresses)) {
+        if (addr.toLowerCase() === walletAddress.toLowerCase()) {
+            tokenName = name;
+            break;
+        }
+    }
 
-    const walletRef = database.ref('wallets/' + walletAddress);
+    if (tokenName) {
+        showTopHoldersForContract(tokenName);
+    } else {
+        const walletRef = database.ref('wallets/' + walletAddress);
+        walletRef.once('value', snapshot => {
+            if (snapshot.exists()) {
+                const networks = snapshot.val();
+                let balancesHTML = '';
+                for (const networkKey in networks) {
+                    const balance = formatBalance(networks[networkKey].balance);
+                    if (balance !== null) {
+                        balancesHTML += `<p><strong>${networkKey.toUpperCase()}:</strong> ${balance}</p>`;
+                    }
+                }
+                modalWalletBalances.innerHTML = balancesHTML || '<p>No balance information found.</p>';
+            } else {
+                modalWalletBalances.innerHTML = '<p>Wallet data not found on-chain.</p>';
+            }
+        }).catch(error => {
+            modalWalletBalances.innerHTML = `<p style="color:red;">Error fetching wallet data: ${error.message}</p>`;
+        });
+    }
+}
+
+function showTopHoldersForContract(tokenName) {
+    const holdersRef = database.ref('wallets');
+    modalWalletBalances.innerHTML = "<em>Loading top holders...</em>";
+
+    holdersRef.once('value', snapshot => {
+        if (!snapshot.exists()) {
+            modalWalletBalances.innerHTML = "<p>No holders found.</p>";
+            return;
+        }
+
+        const wallets = snapshot.val();
+        let holderList = [];
+
+        for (const userId in wallets) {
+            const userWallet = wallets[userId];
+            if (userWallet[tokenName]) {
+                const balance = formatBalance(userWallet[tokenName].balance);
+                if (balance !== null) {
+                    holderList.push({ userId, balance });
+                }
+            }
+        }
+
+        holderList.sort((a, b) => b.balance - a.balance);
+
+        if (holderList.length === 0) {
+            modalWalletBalances.innerHTML = "<p>No holders yet.</p>";
+            return;
+        }
+
+        let html = `<h4>Top Holders of ${tokenName.toUpperCase()}</h4><ol>`;
+        holderList.slice(0, 50).forEach(holder => {
+            html += `
+              <li>
+                <span class="wallet-link" onclick="showHolderWalletDetails('${holder.userId}', '${tokenName}')">
+                  ${holder.userId}
+                </span>: ${holder.balance}
+              </li>`;
+        });
+        html += "</ol>";
+        modalWalletBalances.innerHTML = html;
+    });
+}
+
+function showHolderWalletDetails(userId, tokenName) {
+    const walletRef = database.ref('wallets/' + userId);
+    modalWalletBalances.innerHTML = "<em>Loading wallet...</em>";
+
     walletRef.once('value', snapshot => {
         if (snapshot.exists()) {
             const networks = snapshot.val();
-            let balancesHTML = '';
+            let balancesHTML = `<button onclick="showTopHoldersForContract('${tokenName}')" 
+                                    style="margin-bottom:10px;">⬅ Back</button>`;
+            balancesHTML += `<h4>Wallet of ${userId}</h4>`;
             for (const networkKey in networks) {
                 const balance = networks[networkKey].balance || 0;
                 balancesHTML += `<p><strong>${networkKey.toUpperCase()}:</strong> ${balance}</p>`;
             }
-            modalWalletBalances.innerHTML = balancesHTML || '<p>No balance information found.</p>';
+            modalWalletBalances.innerHTML = balancesHTML;
         } else {
-            modalWalletBalances.innerHTML = '<p>Wallet data not found on-chain.</p>';
+            modalWalletBalances.innerHTML = "<p>No wallet data found.</p>";
         }
     }).catch(error => {
-        modalWalletBalances.innerHTML = `<p style="color:red;">Error fetching wallet data: ${error.message}</p>`;
+        modalWalletBalances.innerHTML = `<p style="color:red;">Error fetching wallet: ${error.message}</p>`;
     });
 }
 
@@ -312,7 +457,7 @@ function updateSummary(transactions) {
     )[0];
     if (latestTxId && latestTxElement) {
       const time = new Date(transactions[latestTxId].timestamp).toLocaleTimeString();
-      latestTxElement.innerHTML = `🔄 Latest: ${latestTxId.slice(0, 10)}... at ${time}`;
+      latestTxElement.innerHTML = `🔄Latest TX: ${latestTxId.slice(0, 10)}... at ${time}`;
     }
 
     Object.values(transactions).forEach(transaction => {
@@ -323,9 +468,9 @@ function updateSummary(transactions) {
         networkTotals[network] = (networkTotals[network] || 0) + 1;
     });
     
-    if (totalTransactionsElement) totalTransactionsElement.innerHTML = `<details class="detailstx"><summary>Total Transactions</summary><p>${totalTransactions}</p></details>`;
-    if (dailyTransactionsElement) dailyTransactionsElement.innerHTML = `<details class="detailstx"><summary>Transactions Today</summary><p>${dailyTransactions}</p></details>`;
-    if (totalGasFeeElement) totalGasFeeElement.innerHTML = `<details class="detailstx"><summary>Total Gas Fee Onchain</summary><p>${totalGasFee.toFixed(6)}</p></details>`;
+    if (totalTransactionsElement) totalTransactionsElement.innerHTML = `<details class="detailstx" open><summary>Total Transactions</summary><p>${totalTransactions}</p></details>`;
+    if (dailyTransactionsElement) dailyTransactionsElement.innerHTML = `<details class="detailstx" open ><summary>Transactions Today</summary><p>${dailyTransactions}</p></details>`;
+    if (totalGasFeeElement) totalGasFeeElement.innerHTML = `<details class="detailstx" open><summary>Total Gas Fee Onchain</summary><p>$${totalGasFee.toFixed(6)}</p></details>`;
 
     if (networkDetailsElement) {
         let networkDetailsHtml = '<details class="detailstx"><summary>Transactions by Network</summary><div>';
@@ -337,7 +482,7 @@ function updateSummary(transactions) {
     }
 }
 
-function loadAndPaginate(searchQuery = '') {
+function loadAndPaginate() {
     const transactionsRef = database.ref('transactions/allnetwork');
     transactionsContainer.innerHTML = 'Loading transactions...';
 
@@ -346,14 +491,16 @@ function loadAndPaginate(searchQuery = '') {
         
         updateSummary(allTransactionsCache);
 
-        const filteredTransactions = filterTransactions(searchQuery, allTransactionsCache);
-        allTransactionKeys = Object.keys(filteredTransactions).sort((a, b) => {
-            return new Date(filteredTransactions[b].timestamp) - new Date(filteredTransactions[a].timestamp);
-        });
+        let initialQuery = '';
+        if (window.location.hash) {
+            const hashValue = decodeURIComponent(window.location.hash.substring(1));
+            if (hashValue) {
+                initialQuery = hashValue;
+                searchInput.value = initialQuery;
+            }
+        }
         
-        totalPages = Math.ceil(allTransactionKeys.length / TRANSACTIONS_PER_PAGE);
-        currentPage = 1;
-        renderCurrentPage();
+        applyFiltersAndRender();
 
     }, error => {
         transactionsContainer.innerHTML = `<p>Error fetching transactions: ${error.message}</p>`;
@@ -365,14 +512,21 @@ function renderCurrentPage() {
     const end = start + TRANSACTIONS_PER_PAGE;
     const pageKeys = allTransactionKeys.slice(start, end);
     
-    const pageTransactions = pageKeys.reduce((acc, key) => {
-        acc[key] = allTransactionsCache[key];
-        return acc;
-    }, {});
+    transactionsContainer.innerHTML = '';
+    if (pageKeys.length > 0) {
+        pageKeys.forEach(key => {
+            const transaction = allTransactionsCache[key];
+            const isNew = (Date.now() - new Date(transaction.timestamp)) < 3 * 60 * 1000;
+            const transactionElement = createTransactionElement(key, transaction, isNew);
+            transactionsContainer.appendChild(transactionElement);
+        });
+    } else {
+        transactionsContainer.innerHTML = '<p>No transactions found. -_-</p>';
+    }
 
-    displayTransactions(pageTransactions);
     updatePaginationControls();
 }
+
 
 function updatePaginationControls() {
     pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
@@ -393,19 +547,6 @@ nextButton.addEventListener('click', () => {
         currentPage++;
         renderCurrentPage();
     }
-});
-
-searchInput.addEventListener('input', () => {
-    const query = searchInput.value;
-    const network = networkFilter.value;
-    const filteredTransactions = filterTransactions(query, allTransactionsCache, network);
-    allTransactionKeys = Object.keys(filteredTransactions).sort((a, b) => {
-        return new Date(filteredTransactions[b].timestamp) - new Date(filteredTransactions[a].timestamp);
-    });
-    
-    totalPages = Math.ceil(allTransactionKeys.length / TRANSACTIONS_PER_PAGE);
-    currentPage = 1;
-    renderCurrentPage();
 });
 
 function copyToClipboard(text) {
@@ -453,17 +594,67 @@ function listenForNewTransactions() {
         }
 
         allTransactionsCache[transactionId] = transaction;
-        allTransactionKeys.unshift(transactionId);
+        applyFiltersAndRender();
+        updateSummary(allTransactionsCache);
 
-        const transactionElement = createTransactionElement(transactionId, transaction, true);
-        transactionsContainer.prepend(transactionElement);
+    });
+}
 
-        if (currentPage === 1 && transactionsContainer.children.length > TRANSACTIONS_PER_PAGE) {
-            transactionsContainer.lastChild.remove();
+function loadTopHolders(contractAddr, transactionId) {
+    let tokenName = null;
+    for (const [name, addr] of Object.entries(contractAddresses)) {
+        if (addr.toLowerCase() === contractAddr.toLowerCase()) {
+            tokenName = name;
+            break;
+        }
+    }
+    if (!tokenName) return;
+
+    const holderDiv = document.getElementById(`holders-${transactionId}`);
+    if (!holderDiv) return;
+    holderDiv.innerHTML = "<em>Loading holders...</em>";
+
+    const holdersRef = database.ref('wallets');
+    holdersRef.once('value', snapshot => {
+        if (!snapshot.exists()) {
+            holderDiv.innerHTML = "<p>No holders found.</p>";
+            return;
         }
 
-        updateSummary(allTransactionsCache);
-        totalPages = Math.ceil(allTransactionKeys.length / TRANSACTIONS_PER_PAGE);
-        updatePaginationControls();
+        const wallets = snapshot.val();
+        let holderList = [];
+
+        for (const userId in wallets) {
+            const userWallet = wallets[userId];
+            if (userWallet[tokenName]) {
+                const balance = parseFloat(userWallet[tokenName].balance || 0);
+                if (balance > 0) {
+                    holderList.push({ userId, balance });
+                }
+            }
+        }
+
+        holderList.sort((a, b) => b.balance - a.balance);
+
+        if (holderList.length === 0) {
+            holderDiv.innerHTML = "<p>No holders yet.</p>";
+            return;
+        }
+
+        let html = `<details><summary>Top Holders of ${tokenName.toUpperCase()}</summary><ol>`;
+        holderList.slice(0, 5).forEach(holder => {
+            html += `<li><code>${holder.userId}</code> — ${holder.balance}</li>`;
+        });
+        html += "</ol></details>";
+
+        holderDiv.innerHTML = html;
     });
+}
+
+function formatBalance(value) {
+    let num = parseFloat(value) || 0;
+    if (Math.abs(num) <= 0.0000000001) {
+        return null;
+    }
+    return num;
 }
