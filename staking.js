@@ -111,11 +111,37 @@ function formatDateToIndonesian(date) {
     }).format(new Date(date));
 }
 
+document.addEventListener("DOMContentLoaded", function () {
+    const validatorSelect = document.getElementById("validatorSelect");
+
+    const validatorsList = [
+        { value: "", label: "-- Select Validator --", apy: null },
+        { value: "mining.js", label: "Mining.js", apy: 50 },
+        { value: "ethereum.org", label: "Ethereum", apy: 5 },
+        { value: "optimism.org", label: "Optimism", apy: 15 },
+        { value: "lido.fi", label: "Lido", apy: 2.9 },
+        { value: "coinbase.com", label: "Coinbase", apy: 30 },
+        { value: "solanabeach.io", label: "SolanaBeach", apy: 20 }
+    ];
+
+    validatorSelect.innerHTML = "";
+    validatorsList.forEach(v => {
+        const opt = document.createElement("option");
+        opt.value = v.value;
+        opt.textContent = v.label;
+        validatorSelect.appendChild(opt);
+    });
+
+    window.validatorsList = validatorsList;
+});
+
 stakeButton.addEventListener('click', () => {
-    const amount = parseFloat(stakeAmountInput.value);
     const selectedValidator = validatorSelect.value;
-    const apy = parseFloat(validatorSelect.options[validatorSelect.selectedIndex]?.dataset.apy);
+    const validatorObj = window.validatorsList.find(v => v.value === selectedValidator);
+    const apy = validatorObj ? validatorObj.apy : NaN;
     const autoCompound = autoCompoundCheckbox.checked;
+
+    const amount = parseFloat(stakeAmountInput.value);
 
     if (!selectedValidator || isNaN(apy)) {
         stakingResult.textContent = 'Please select a valid validator.';
@@ -443,8 +469,10 @@ function calculateReward(amount, durationInDays, apy) {
 
 function updateEstimatedReward() {
     const amount = parseFloat(stakeAmountInput.value);
-    const selectedValidatorOption = validatorSelect.options[validatorSelect.selectedIndex];
-    const apy = parseFloat(selectedValidatorOption?.dataset.apy);
+    const selectedValidator = validatorSelect.value;
+const validatorObj = window.validatorsList.find(v => v.value === selectedValidator);
+const apy = validatorObj ? validatorObj.apy : NaN;
+
     
     if (!isNaN(amount) && amount > 0 && !isNaN(apy)) {
         const estimatedReward = calculateReward(amount, 1, apy);
@@ -457,8 +485,10 @@ function updateEstimatedReward() {
 stakeAmountInput.addEventListener('input', updateEstimatedReward);
 
 validatorSelect.addEventListener('change', () => {
-    const selectedOption = validatorSelect.options[validatorSelect.selectedIndex];
-    const apy = selectedOption.dataset.apy;
+    const selectedValidator = validatorSelect.value;
+const validatorObj = window.validatorsList.find(v => v.value === selectedValidator);
+const apy = validatorObj ? validatorObj.apy : null;
+
     
     if (apy) {
         document.getElementById('currentApyDisplay').textContent = `APY: ${apy}%`;
