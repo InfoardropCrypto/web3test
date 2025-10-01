@@ -41,9 +41,13 @@
               Wallet Balance : <span id="walletBalance">0.0000</span> <span id="selectedNetwork">Loading...</span> <img id="networkIcon" src="iac.png" alt="Icon" style="border-radius:100%;width:20px;"></p>
             </div>
             <p><strong>Your Voting Power:</strong> <span id="votingPower">0</span></p>
-            <p><strong>Staking Balance:</strong></p>
+            </div>
+
+            <div>
+                <p><strong>Staking Balance:</strong></p>
             <div id="votingPowerBreakdown"></div>
             </div>
+
         <div class="wallet-details">
             
             <div class="tvl-container">
@@ -57,13 +61,6 @@
             <input type="number" id="stakeAmount" step="0.0001" placeholder="Stake amount">
             
             <select id="validatorSelect">
-              <option value="">-- Select Validator --</option>
-              <option value="mining.js" data-apy="50">Mining.js</option>
-              <option value="ethereum.org" data-apy="5">Ethereum</option>
-              <option value="optimism.org" data-apy="15">Optimism</option>
-              <option value="lido.fi" data-apy="2.9">Lido</option>
-              <option value="coinbase.com" data-apy="30">Coinbase</option>
-              <option value="solanabeach.io" data-apy="20">SolanaBeach</option>
             </select>
 
             <div id="currentApyDisplay">APY: -</div>
