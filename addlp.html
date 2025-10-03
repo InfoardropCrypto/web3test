@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICfinance</title>
+    <link rel="stylesheet" href="staking.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div id="authContainer">
+        <div class="auth-form-container">
+            <h2>Sign In</h2>
+            <form id="signInForm">
+                <input type="email" id="emailInput" placeholder="Email" required>
+                <input type="password" id="passwordInput" placeholder="Password" required>
+                <button type="submit">Sign In</button>
+            </form>
+            <p>Don't have an account? <a href="index.html">Sign Up</a></p>
+        </div>
+    </div>
+
+    <div id="liquidityContainer" style="display: none;">
+        <nav class="logo-container">
+            <h1>ICfinance</h1>
+            <button id="connectWalletButton" class="button" onclick="alert('Connected')">Connected</button>
+            <button id="themeToggle" class="icon-button">
+                <i class="fas fa-sun" id="themeIcon"></i>
+            </button>
+        </nav>
+
+        <div class="liquidity-form">
+            <h2>ADD LP</h2>
+            <p>Combine two tokens to create a liquidity pool token.</p>
+
+            <div class="token-selection-wrapper">
+                <div class="token-input-header">
+                    <span>Input Amount</span>
+                    <span>Balance: <span id="token1Balance">0.0000</span></span>
+                </div>
+                <div class="token-input-container">
+                    <input type="number" id="token1Amount" step="0.0001" placeholder="0.0">
+                    <div class="custom-select-trigger" id="token1SelectTrigger">
+                        <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/825.png" alt="USDT_SUI" id="token1SelectedImage">
+                        <span id="token1SelectedText">USDT_SUI</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+                <div class="custom-select-options" id="token1Options">
+                    </div>
+            </div>
+
+            <div class="token-selection-wrapper">
+                <div class="token-input-header">
+                    <span>Token 2</span>
+                    <span>Balance: <span id="token2Balance">0.0000</span></span>
+                </div>
+                <div class="token-input-container">
+                    <input type="number" id="token2Amount" step="0.0001" placeholder="0.0">
+                    <div class="custom-select-trigger" id="token2SelectTrigger">
+                        <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/20947.png" alt="SUI" id="token2SelectedImage">
+                        <span id="token2SelectedText">SUI</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+                <div class="custom-select-options" id="token2Options">
+                    </div>
+            </div>
+
+            <div class="liquidity-pool-token">
+                <strong>You will receive:</strong> <span id="lpTokenName"></span>
+            </div>
+
+            <button id="addLiquidityButton" class="stake-button">Add Liquidity</button>
+        </div>
+
+        <div id="currentLiquidity">
+            <h3>Your Liquidity Positions:</h3>
+        </div>
+    </div>
+
+    <div id="notification-container"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="addlp.js"></script>
+</body>
+</html>
